@@ -1,0 +1,15 @@
+workspace:
+    base: /go
+    path: src/github.com/SierraSoftworks/bender
+
+pipeline:
+    publish:docker:
+        image: plugins/docker
+        repo: sierrasoftworks/bender
+        tag:
+            - latest
+            - "${DRONE_COMMIT_BRANCH}"
+        build_args:
+            - "VERSION=${DRONE_COMMIT_SHA}"
+            - "SENTRY_DSN=$${SENTRY_DSN}"
+        secrets: [ docker_username, docker_password, sentry_dsn ]

@@ -1,0 +1,106 @@
+HOST: https://bender.sierrasoftworks.com
+FORMAT: 1A
+
+# Bender API
+Bender is a small API which allows you to run a BaaS stack (Bender as a Service)
+for those times you really wish you could tell a web app to bite your shiny metal
+ass.
+
+## Data Structures
+
+### Quote (object)
++ quote: `Bite my shiny metal ass.` (string, required) - The content of the quote
++ who: Bender (string, required) - The person who made the quote.
+
+### Not Found Error (object)
++ code: 404 (number, required) - The HTTP error code describing the problem
++ error: `Not Found` (string, required) - The HTTP error message describing the problem
++ message: `We could not find the resource you were looking for, please check your request and try again.` (string, required) - A human readable description for the error
+
+## Group Quotes API
+The quotes API allows you to request a random quote, optionally constraining the
+person from whom you would like to receive a quote.
+
+### Quote [/api/v1/quote/{person}]
++ Parameters
+    + person: bender (string, optional) - The optional name of the person to get quotes for.
+    If not provided then a random quote is returned
+
+#### Get Quote [GET]
++ Request
+    + Headers
+
+            Accept: application/json
+
++ Response 200 (application/json)
+    + Attributes (Quote)
+
++ Response 404 (application/json)
+    + Attributes (Not Found Error)
+
++ Request
+  If you'd prefer to receive your quote in nice, human readable, text form then go
+  and set your `Accept` header to `text/plain`.
+
+    + Headers
+
+            Accept: text/plain
+
++ Response 200 (application/json)
+    + Body
+
+            Bite my shiny metal ass. – Bender
+
++ Response 404 (application/json)
+    + Attributes (Not Found Error)
+
++ Request
+  Really, most people are going to try this API out in their browsers, so if you
+  provide an `Accept` header with `text/html` in it we will send you some nice
+  HTML which will look great in your browser.
+
+    + Headers
+
+            Accept: text/html
+
++ Response 200 (text/html)
+    + Body
+
+            <html>
+                <head>
+                    <style>
+                        body {
+                            font-family: Sans-serif;
+                        }
+
+                        figure {
+                            margin: 20px;
+                        }
+
+                        blockquote {
+                            margin-left: 1em;
+                        }
+
+                        figcaption {
+                            margin-left: 2em;
+                            font-size: 0.8em;
+                            font-weight: bold;
+                        }
+
+                        figcaption::before {
+                            display: inline;
+                            content: "–";
+                            padding-right: 0.5em;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <figure>
+                        <blockquote>Bite my shiny metal ass.</blockquote>
+                        <figcaption>Bender</figcaption>
+                    </figure>
+                </body>
+            </html>
+
++ Response 404 (application/json)
+    + Attributes (Not Found Error)
