@@ -20,9 +20,6 @@ RUN go build -o bin/bender -a -installsuffix cgo -ldflags "-s -X main.version=$V
 FROM alpine:latest
 LABEL maintainer="Sierra Softworks <admin@sierrasoftworks.com>"
 
-RUN apk add --update tini
-ENTRYPOINT ["/sbin/tini", "--"]
-
 COPY --from=0 /go/src/github.com/SierraSoftworks/bender/bin/bender /bin/bender
 ADD quotes.json /etc/quotes.json
 
