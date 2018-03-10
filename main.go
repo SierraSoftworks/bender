@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"strings"
+	"time"
 
 	"github.com/SierraSoftworks/bender/api"
 	"github.com/SierraSoftworks/bender/models"
@@ -12,7 +13,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-var version = "v1.0.0"
+var version = "development"
 var sentryDSN = ""
 
 func main() {
@@ -25,6 +26,8 @@ func main() {
 	sentry.UpdateDefaultClient(
 		sentry.Release(version),
 	)
+
+	defer sentry.DefaultSendQueue().Shutdown(true)
 
 	app := cli.NewApp()
 	app.Name = "Bender"
@@ -92,10 +95,20 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		sentry.DefaultClient().Capture(
+		log.WithError(err).Error("Failed to run application")
+
+		e := sentry.DefaultClient().Capture(
 			sentry.ExceptionForError(err),
 			sentry.Level(sentry.Fatal),
-		).Wait()
+		)
+		select {
+		case err, ok := <-e.WaitChannel():
+			if ok && err != nil {
+				log.WithError(err).Warn("Failed to send error to Sentry")
+			}
+		case <-time.After(time.Second):
+			log.Warn("Timed out sending error to Sentry")
+		}
 
 		os.Exit(1)
 	}
