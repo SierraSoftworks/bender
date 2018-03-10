@@ -15,7 +15,9 @@ pipeline:
         secrets: [ docker_username, docker_password, sentry_dsn ]
 
     sentry:release:
-      image: sierrasoftworks/drone-sentry:latest
+      image: sierrasoftworks/drone-sentry
+      pull: true
+      
       organization: open-source
       project: bender
 
@@ -28,7 +30,9 @@ pipeline:
         - sentry_token
 
     sentry:deploy:
-      image: sierrasoftworks/drone-sentry:latest
+      image: sierrasoftworks/drone-sentry
+      pull: true
+
       organization: open-source
       project: bender
 
