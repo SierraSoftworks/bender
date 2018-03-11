@@ -17,6 +17,7 @@ var version = "development"
 var sentryDSN = ""
 
 func main() {
+	sentry.AddInternalPrefixes("github.com/SierraSoftworks/bender")
 	sentry.AddDefaultOptions(
 		sentry.Release(version),
 		sentry.DSN(sentryDSN),
