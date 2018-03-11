@@ -17,15 +17,13 @@ var version = "development"
 var sentryDSN = ""
 
 func main() {
-	if envDSN := os.Getenv("SENTRY_DSN"); envDSN != "" {
-		sentry.UpdateDefaultClient(sentry.DSN(envDSN))
-	} else if sentryDSN != "" {
-		sentry.UpdateDefaultClient(sentry.DSN(sentryDSN))
-	}
-
-	sentry.UpdateDefaultClient(
+	sentry.AddDefaultOptions(
 		sentry.Release(version),
+		sentry.DSN(sentryDSN),
 	)
+	if envDSN := os.Getenv("SENTRY_DSN"); envDSN != "" {
+		sentry.AddDefaultOptions(sentry.DSN(envDSN))
+	}
 
 	defer sentry.DefaultSendQueue().Shutdown(true)
 

@@ -12,13 +12,11 @@ import (
 func SentryRequestLogger(c *girder.Context) error {
 	route := mux.CurrentRoute(c.Request)
 
-	cl := sentry.DefaultClient().With(
+	e := sentry.NewClient(
 		sentry.Culprit(route.GetName()),
 		sentry.Logger("api"),
 		sentry.HTTPRequest(c.Request).WithHeaders(),
-	)
-
-	e := cl.Capture(
+	).Capture(
 		sentry.Message("Received Request for Route: %s", route.GetName()),
 		sentry.Level(sentry.Info),
 	)
