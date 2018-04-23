@@ -17,16 +17,18 @@ var version = "development"
 var sentryDSN = ""
 
 func main() {
+	sentryQueue := sentry.NewSequentialSendQueue(10)
+	defer sentryQueue.Shutdown(true)
+
 	sentry.AddInternalPrefixes("github.com/SierraSoftworks/bender")
 	sentry.AddDefaultOptions(
 		sentry.Release(version),
 		sentry.DSN(sentryDSN),
+		sentry.UseSendQueue(sentryQueue),
 	)
 	if envDSN := os.Getenv("SENTRY_DSN"); envDSN != "" {
 		sentry.AddDefaultOptions(sentry.DSN(envDSN))
 	}
-
-	defer sentry.DefaultSendQueue().Shutdown(true)
 
 	app := cli.NewApp()
 	app.Name = "Bender"
