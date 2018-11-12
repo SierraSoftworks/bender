@@ -13,7 +13,7 @@ RUN go test -v ./...
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
-RUN go build -o bin/bender -a -installsuffix cgo -ldflags "-s -X main.version=$VERSION -X main.sentryDSN=$SENTRY_DSN"
+RUN ["go", "build", "-o", "bin/bender", "-a", "-installsuffix", "cgo", "-ldflags", "-s -X main.version=$VERSION -X main.sentryDSN=$SENTRY_DSN"]
 
 # Build the actual container
 FROM alpine:latest
