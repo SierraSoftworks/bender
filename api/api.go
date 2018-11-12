@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/SierraSoftworks/bender/models"
-	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
+	log "github.com/sirupsen/logrus"
 )
 
 var registrars = []func(*API) error{}

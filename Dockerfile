@@ -1,5 +1,5 @@
 # Use a mutli-stage build pipeline to generate the executable
-FROM golang:1.9
+FROM golang:1.11
 
 ARG SENTRY_DSN=""
 ARG VERSION="development"
@@ -9,7 +9,6 @@ ENV GO_PATH="/go"
 ADD . $GO_PATH/src/github.com/SierraSoftworks/bender
 WORKDIR $GO_PATH/src/github.com/SierraSoftworks/bender
 
-RUN go get -t ./...
 RUN go test -v ./...
 
 ENV CGO_ENABLED=0

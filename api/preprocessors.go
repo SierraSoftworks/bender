@@ -5,8 +5,8 @@ import (
 
 	"github.com/SierraSoftworks/girder"
 	sentry "github.com/SierraSoftworks/sentry-go"
-	log "github.com/Sirupsen/logrus"
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
 func SentryRequestLogger(c *girder.Context) error {

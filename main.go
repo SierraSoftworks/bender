@@ -8,8 +8,8 @@ import (
 	"github.com/SierraSoftworks/bender/api"
 	"github.com/SierraSoftworks/bender/models"
 	sentry "github.com/SierraSoftworks/sentry-go"
-	log "github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 )
 

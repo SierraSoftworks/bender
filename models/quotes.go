@@ -9,8 +9,8 @@ import (
 	"time"
 
 	sentry "github.com/SierraSoftworks/sentry-go"
-	log "github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 )
 
 type Quote struct {
