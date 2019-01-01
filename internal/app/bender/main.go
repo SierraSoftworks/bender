@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/SierraSoftworks/bender/api"
-	"github.com/SierraSoftworks/bender/models"
+	"github.com/SierraSoftworks/bender/internal/pkg/api"
+	"github.com/SierraSoftworks/bender/internal/pkg/providers"
 	sentry "github.com/SierraSoftworks/sentry-go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -45,10 +46,11 @@ func main() {
 			Usage: "The file containing quotes to load",
 			Value: "quotes.json",
 		},
-		cli.StringFlag{
-			Name:  "address",
-			Usage: "The address to expose the server on",
-			Value: ":8080",
+		cli.IntFlag{
+			Name:   "port",
+			Usage:  "The port to expose the server on",
+			Value:  8080,
+			EnvVar: "PORT",
 		},
 		cli.StringFlag{
 			Name:  "log-level",
@@ -80,7 +82,7 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
-		quotes := models.NewQuoteProvider()
+		quotes := providers.NewQuoteProvider()
 		if err := quotes.Load(c.String("quotes")); err != nil {
 			log.WithError(err).Error("Failed to load quotes file")
 			return errors.Wrap(err, "failed to load quotes file")
@@ -92,7 +94,7 @@ func main() {
 			return errors.Wrap(err, "failed to initialize the API")
 		}
 
-		return errors.Wrap(api.ListenAndServe(c.String("address")), "failed to start server")
+		return errors.Wrap(api.ListenAndServe(fmt.Sprintf(":%d", c.Int("port"))), "failed to start server")
 	}
 
 	if err := app.Run(os.Args); err != nil {

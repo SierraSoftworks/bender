@@ -1,0 +1,3 @@
+dispatch:
+  - url: "bender.sierrasoftworks.com/"
+    service: default

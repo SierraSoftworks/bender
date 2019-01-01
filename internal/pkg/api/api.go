@@ -3,7 +3,8 @@ package api
 import (
 	"net/http"
 
-	"github.com/SierraSoftworks/bender/models"
+	"github.com/SierraSoftworks/bender/internal/pkg/providers"
+
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
@@ -16,11 +17,11 @@ func addRegistrar(r func(*API) error) {
 }
 
 type API struct {
-	quotes *models.QuoteProvider
+	quotes *providers.QuoteProvider
 	router *mux.Router
 }
 
-func NewAPI(quotes *models.QuoteProvider) (*API, error) {
+func NewAPI(quotes *providers.QuoteProvider) (*API, error) {
 	api := &API{
 		quotes: quotes,
 		router: mux.NewRouter(),
@@ -35,7 +36,7 @@ func NewAPI(quotes *models.QuoteProvider) (*API, error) {
 	return api, nil
 }
 
-func (a *API) Quotes() *models.QuoteProvider {
+func (a *API) Quotes() *providers.QuoteProvider {
 	return a.quotes
 }
 

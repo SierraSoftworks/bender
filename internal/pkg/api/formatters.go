@@ -5,7 +5,7 @@ import (
 	"html"
 	"io"
 
-	"github.com/SierraSoftworks/bender/models"
+	"github.com/SierraSoftworks/bender/pkg/models"
 )
 
 type TextFormatter struct {

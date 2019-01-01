@@ -1,4 +1,4 @@
-package models
+package providers
 
 import (
 	"bytes"
@@ -8,29 +8,26 @@ import (
 	"strings"
 	"time"
 
+	"github.com/SierraSoftworks/bender/pkg/models"
+
 	sentry "github.com/SierraSoftworks/sentry-go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
-type Quote struct {
-	Quote string `json:"quote"`
-	Who   string `json:"who"`
-}
-
 type QuoteProvider struct {
-	quotes  []*Quote
+	quotes  []*models.Quote
 	randSrc rand.Source
 }
 
 func NewQuoteProvider() *QuoteProvider {
 	return &QuoteProvider{
-		quotes:  []*Quote{},
+		quotes:  []*models.Quote{},
 		randSrc: rand.NewSource(time.Now().UnixNano()),
 	}
 }
 
-func (p *QuoteProvider) AddQuote(quote *Quote) {
+func (p *QuoteProvider) AddQuote(quote *models.Quote) {
 	p.quotes = append(p.quotes, quote)
 }
 
@@ -49,7 +46,7 @@ func (p *QuoteProvider) Load(file string) error {
 		"fileSize": len(data),
 	}).WithCategory("models").WithMessage("Parsing quotes file")
 
-	quotes := []*Quote{}
+	quotes := []*models.Quote{}
 	buf := bytes.NewBuffer(data)
 	if err := json.NewDecoder(buf).Decode(&quotes); err != nil {
 		return errors.Wrap(err, "failed to parse quotes file")
@@ -67,12 +64,12 @@ func (p *QuoteProvider) Load(file string) error {
 	return nil
 }
 
-func (p *QuoteProvider) GetRandom() *Quote {
+func (p *QuoteProvider) GetRandom() *models.Quote {
 	return p.pickRandom(p.quotes)
 }
 
-func (p *QuoteProvider) GetAllBy(who string) []*Quote {
-	filtered := []*Quote{}
+func (p *QuoteProvider) GetAllBy(who string) []*models.Quote {
+	filtered := []*models.Quote{}
 	for _, quote := range p.quotes {
 		if strings.EqualFold(quote.Who, who) {
 			filtered = append(filtered, quote)
@@ -82,11 +79,11 @@ func (p *QuoteProvider) GetAllBy(who string) []*Quote {
 	return filtered
 }
 
-func (p *QuoteProvider) GetRandomBy(who string) *Quote {
+func (p *QuoteProvider) GetRandomBy(who string) *models.Quote {
 	return p.pickRandom(p.GetAllBy(who))
 }
 
-func (p *QuoteProvider) pickRandom(slice []*Quote) *Quote {
+func (p *QuoteProvider) pickRandom(slice []*models.Quote) *models.Quote {
 	l := len(slice)
 	if l == 0 {
 		return nil

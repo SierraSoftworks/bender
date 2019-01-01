@@ -3,7 +3,7 @@ package api
 import (
 	"time"
 
-	"github.com/SierraSoftworks/bender/models"
+	"github.com/SierraSoftworks/bender/pkg/models"
 	"github.com/SierraSoftworks/girder"
 )
 

@@ -1,7 +1,8 @@
 # Use a mutli-stage build pipeline to generate the executable
-FROM golang:1.11
+FROM golang:1.11-alpine
 
-ARG SENTRY_DSN=""
+RUN apk add --no-cache build-base git
+
 ARG VERSION="development"
 
 ADD . /src
@@ -11,14 +12,14 @@ RUN ["go", "test", "-v", "./..."]
 
 ENV CGO_ENABLED=0
 ENV GOOS=linux
-RUN ["go", "build", "-o", "bin/bender", "-a", "-installsuffix", "cgo", "-ldflags", "-s -X main.version=$VERSION -X main.sentryDSN=$SENTRY_DSN"]
+RUN ["go", "build", "-o", "bin/bender", "-a", "-installsuffix", "cgo", "-ldflags", "-s -X main.version=$VERSION", "./internal/app/bender"]
 
 # Build the actual container
 FROM alpine:latest
 LABEL maintainer="Sierra Softworks <admin@sierrasoftworks.com>"
 
-COPY --from=0 /go/src/github.com/SierraSoftworks/bender/bin/bender /bin/bender
-ADD quotes.json /etc/quotes.json
+COPY --from=0 /src/bin/bender /bin/bender
+ADD configs/quotes.json /etc/quotes.json
 
 EXPOSE 8080
 
