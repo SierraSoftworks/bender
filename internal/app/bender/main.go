@@ -15,7 +15,7 @@ import (
 )
 
 var version = "development"
-var sentryDSN = ""
+var sentryDSN = "https://0f9ec16cd0e2473bb994e7108d951b86@sentry.io/1362607"
 
 func main() {
 	sentryQueue := sentry.NewSequentialSendQueue(10)
