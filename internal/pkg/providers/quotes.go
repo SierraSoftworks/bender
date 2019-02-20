@@ -1,17 +1,14 @@
 package providers
 
 import (
-	"bytes"
-	"encoding/json"
-	"io/ioutil"
 	"math/rand"
 	"strings"
 	"time"
 
+	"github.com/SierraSoftworks/bender/internal/pkg/loaders"
 	"github.com/SierraSoftworks/bender/pkg/models"
 
 	sentry "github.com/SierraSoftworks/sentry-go"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -31,33 +28,18 @@ func (p *QuoteProvider) AddQuote(quote *models.Quote) {
 	p.quotes = append(p.quotes, quote)
 }
 
-func (p *QuoteProvider) Load(file string) error {
-	sentry.DefaultBreadcrumbs().NewDefault(map[string]interface{}{
-		"file": file,
-	}).WithCategory("models").WithMessage("Loading quotes file")
-
-	data, err := ioutil.ReadFile(file)
+func (p *QuoteProvider) Load(loader loaders.Loader) error {
+	quotes, err := loader.Load()
 	if err != nil {
-		return errors.Wrap(err, "failed to read quotes file")
+		log.WithError(err).Error("Failed to load quotes")
+		return err
 	}
 
 	sentry.DefaultBreadcrumbs().NewDefault(map[string]interface{}{
-		"file":     file,
-		"fileSize": len(data),
-	}).WithCategory("models").WithMessage("Parsing quotes file")
-
-	quotes := []*models.Quote{}
-	buf := bytes.NewBuffer(data)
-	if err := json.NewDecoder(buf).Decode(&quotes); err != nil {
-		return errors.Wrap(err, "failed to parse quotes file")
-	}
-
-	sentry.DefaultBreadcrumbs().NewDefault(map[string]interface{}{
-		"file":   file,
 		"quotes": len(quotes),
 	}).WithCategory("models").WithMessage("Loaded new quotes")
 
-	log.WithField("file", file).Infof("Loaded %d new quotes", len(quotes))
+	log.Infof("Loaded %d new quotes", len(quotes))
 
 	p.quotes = append(p.quotes, quotes...)
 

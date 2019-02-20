@@ -44,7 +44,7 @@ func (a *API) Router() *mux.Router {
 	return a.router
 }
 
-func (a *API) ListenAndServe(address string) error {
+func (a *API) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.Handle("/api/", a.router)
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -53,8 +53,12 @@ func (a *API) ListenAndServe(address string) error {
 		w.Write([]byte(`{"code": 404, "error": "Not Found", "message": "The method you attempted to make use of could not be found on our system."}`))
 	})
 
-	log.WithField("address", address).Info("Starting server")
-	return http.ListenAndServe(address, cors.New(cors.Options{
+	return cors.New(cors.Options{
 		Debug: false,
-	}).Handler(mux))
+	}).Handler(mux)
+}
+
+func (a *API) ListenAndServe(address string) error {
+	log.WithField("address", address).Info("Starting server")
+	return http.ListenAndServe(address, a.Handler())
 }

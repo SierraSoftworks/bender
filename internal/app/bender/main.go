@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/SierraSoftworks/bender/internal/pkg/api"
+	"github.com/SierraSoftworks/bender/internal/pkg/loaders"
 	"github.com/SierraSoftworks/bender/internal/pkg/providers"
 	sentry "github.com/SierraSoftworks/sentry-go"
 	"github.com/pkg/errors"
@@ -82,8 +83,10 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
+		loader := loaders.New(c.String("quotes"))
+
 		quotes := providers.NewQuoteProvider()
-		if err := quotes.Load(c.String("quotes")); err != nil {
+		if err := quotes.Load(loader); err != nil {
 			log.WithError(err).Error("Failed to load quotes file")
 			return errors.Wrap(err, "failed to load quotes file")
 		}
