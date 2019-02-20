@@ -1,4 +1,4 @@
-package bender
+package bender_gcf
 
 import (
 	"encoding/json"
@@ -22,17 +22,8 @@ var _ = Describe("Function as a Service", func() {
 			Expect(svc.Initialize()).To(BeNil())
 		})
 
-		It("Should have created the Quote provider", func() {
-			Expect(svc.Quotes).ToNot(BeNil())
-		})
-
-		It("Should have loaded a number of quotes", func() {
-			Expect(svc.Quotes).ToNot(BeNil())
-			Expect(len(svc.Quotes.GetAll())).To(BeNumerically(">", 0))
-		})
-
-		It("Should have created the API service", func() {
-			Expect(svc.API).ToNot(BeNil())
+		It("Should have created the App provider", func() {
+			Expect(svc.App).ToNot(BeNil())
 		})
 	})
 

@@ -1,4 +1,4 @@
-package bender
+package bender_gcf
 
 import (
 	"testing"

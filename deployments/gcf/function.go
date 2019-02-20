@@ -1,4 +1,4 @@
-package bender
+package bender_gcf
 
 import (
 	"net/http"
@@ -74,7 +74,7 @@ func Bender(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	service.API.Handler().ServeHTTP(w, r)
+	service.App.Handler().ServeHTTP(w, r)
 
 	scl.Capture(sentry.Message("API called"), sentry.Level(sentry.Debug)).Wait()
 }
