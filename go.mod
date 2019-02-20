@@ -14,7 +14,7 @@ require (
 	github.com/sirupsen/logrus v1.2.0
 	github.com/smartystreets/goconvey v0.0.0-20181108003508-044398e4856c // indirect
 	github.com/urfave/cli v1.20.0
-	google.golang.org/api v0.1.0 // indirect
+	google.golang.org/api v0.1.0
 	google.golang.org/genproto v0.0.0-20190111180523-db91494dd46c // indirect
 	google.golang.org/grpc v1.18.0 // indirect
 )

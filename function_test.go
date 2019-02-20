@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -15,10 +14,6 @@ import (
 )
 
 var _ = Describe("Function as a Service", func() {
-	if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
-		Skip("Google Cloud credentials are not available")
-	}
-
 	ts := httptest.NewServer(http.HandlerFunc(Bender))
 	defer ts.Close()
 

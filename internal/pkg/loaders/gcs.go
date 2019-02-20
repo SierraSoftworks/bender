@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"cloud.google.com/go/storage"
+	"google.golang.org/api/option"
 	"github.com/SierraSoftworks/bender/pkg/models"
 	sentry "github.com/SierraSoftworks/sentry-go"
 	"github.com/pkg/errors"
@@ -32,7 +33,7 @@ func (l *gcsLoader) Load() ([]*models.Quote, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client, err := storage.NewClient(ctx)
+	client, err := storage.NewClient(ctx, option.WithoutAuthentication())
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to access cloud storage account")
 	}
