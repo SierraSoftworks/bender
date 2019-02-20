@@ -50,6 +50,10 @@ func (p *QuoteProvider) GetRandom() *models.Quote {
 	return p.pickRandom(p.quotes)
 }
 
+func (p *QuoteProvider) GetAll() []*models.Quote {
+	return p.quotes
+}
+
 func (p *QuoteProvider) GetAllBy(who string) []*models.Quote {
 	filtered := []*models.Quote{}
 	for _, quote := range p.quotes {

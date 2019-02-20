@@ -19,7 +19,7 @@ func init() {
 	})
 }
 
-var started = time.Now()
+var started = time.Now().UTC()
 
 func (a *API) getStatus(c *girder.Context) (interface{}, error) {
 	return &models.Health{

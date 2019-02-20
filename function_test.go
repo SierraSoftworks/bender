@@ -1,4 +1,4 @@
-package bender_test
+package bender
 
 import (
 	"encoding/json"
@@ -9,13 +9,32 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/SierraSoftworks/bender"
 	"github.com/SierraSoftworks/bender/pkg/models"
 )
 
 var _ = Describe("Function as a Service", func() {
 	ts := httptest.NewServer(http.HandlerFunc(Bender))
 	defer ts.Close()
+
+	Describe("Service", func() {
+		svc := &FunctionService{}
+		It("Should initialize without errors", func() {
+			Expect(svc.Initialize()).To(BeNil())
+		})
+
+		It("Should have created the Quote provider", func() {
+			Expect(svc.Quotes).ToNot(BeNil())
+		})
+
+		It("Should have loaded a number of quotes", func() {
+			Expect(svc.Quotes).ToNot(BeNil())
+			Expect(len(svc.Quotes.GetAll())).To(BeNumerically(">", 0))
+		})
+
+		It("Should have created the API service", func() {
+			Expect(svc.API).ToNot(BeNil())
+		})
+	})
 
 	Describe("Getting a random quote", func() {
 		url := fmt.Sprintf("%s/api/v1/quote", ts.URL)
@@ -26,10 +45,12 @@ var _ = Describe("Function as a Service", func() {
 		})
 
 		It("Should respond with a 200 OK status code", func() {
+			Expect(res).ToNot(BeNil())
 			Expect(res.StatusCode).To(Equal(200))
 		})
 
 		It("Should deserialize into a valid quote", func() {
+			Expect(res).ToNot(BeNil())
 			var quote models.Quote
 			Expect(json.NewDecoder(res.Body).Decode(&quote)).To(BeNil())
 			Expect(quote.Quote).ToNot(BeEmpty())
@@ -46,10 +67,13 @@ var _ = Describe("Function as a Service", func() {
 		})
 
 		It("Should respond with a 200 OK status code", func() {
+			Expect(res).ToNot(BeNil())
 			Expect(res.StatusCode).To(Equal(200))
 		})
 
 		It("Should deserialize into a valid quote", func() {
+			Expect(res).ToNot(BeNil())
+
 			var quote models.Quote
 			Expect(json.NewDecoder(res.Body).Decode(&quote)).To(BeNil())
 			Expect(quote.Quote).ToNot(BeEmpty())
