@@ -5,9 +5,15 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/SierraSoftworks/bender/internal/pkg/loaders"
+
+	"os"
 )
 
 var _ = Describe("GCS", func() {
+	if os.Getenv("GOOGLE_APPLICATION_CREDENTIALS") == "" {
+		Skip("Google Cloud credentials are not available")
+	}
+
 	Describe("NewGCSLoader", func() {
 		loader := NewGCSLoader("cdn.sierrasoftworks.com", "bender/quotes.json")
 		It("should return a loader", func() {
