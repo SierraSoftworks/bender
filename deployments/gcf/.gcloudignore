@@ -1,4 +1,0 @@
-.gcloudignore
-go.mod
-go.sum
-*_test.go
