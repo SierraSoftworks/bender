@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bender.Controllers
 {
     [ApiController]
-    [ApiVersion("1.0")]
+    [Area("v1")]
     public class HealthV1Controller : HealthController<Health.Version1>
     {
         public HealthV1Controller(HealthStore store, IRepresenter<Health, Health.Version1> representer)

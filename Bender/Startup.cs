@@ -48,7 +48,7 @@ namespace Bender
 
             }
 
-            services.AddApiVersioning(opts => opts.UseApiBehavior = true);
+            //services.AddApiVersioning(opts => opts.UseApiBehavior = true);
 
             services.AddResponseCompression();
 
@@ -82,9 +82,9 @@ namespace Bender
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+                app.UseHttpsRedirection();
             }
 
-            app.UseHttpsRedirection();
             app.UseCors(policy => policy.AllowAnyOrigin().WithMethods("GET"));
 
             app.UseCors();

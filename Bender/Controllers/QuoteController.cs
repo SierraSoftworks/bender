@@ -24,7 +24,7 @@ namespace Bender.Controllers
 
         // GET api/v1/quote
         [HttpGet]
-        [Route("api/v{version:apiVersion}/quote")]
+        [Route("api/[area]/quote")]
         [EnableCors]
         public virtual async Task<ActionResult<TView>> Get()
         {
@@ -34,7 +34,7 @@ namespace Bender.Controllers
 
         // GET api/v1/quote/{by}
         [HttpGet]
-        [Route("api/v{version:apiVersion}/quote/{by}")]
+        [Route("api/[area]/quote/{by}")]
         [EnableCors]
         public virtual async Task<ActionResult<TView>> Get(string by)
         {

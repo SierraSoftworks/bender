@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Bender.Controllers
 {
     [ApiController]
-    [ApiVersion("1.0")]
+    [Area("v1")]
     public class QuoteV1Controller : QuoteController<Quote.Version1>
     {
         public QuoteV1Controller(IQuoteStore store, IRepresenter<Quote, Quote.Version1> representer)

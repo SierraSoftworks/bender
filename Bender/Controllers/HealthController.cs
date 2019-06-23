@@ -22,7 +22,7 @@ namespace Bender.Controllers
 
         // GET api/v1/health
         [HttpGet]
-        [Route("api/v{version:apiVersion}/health")]
+        [Route("api/[area]/health")]
         public virtual async Task<ActionResult<TView>> Get()
         {
             var health = await Store.GetHealthAsync();
