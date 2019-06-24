@@ -42,7 +42,7 @@ namespace Bender.Tests.Models
             var serialized = JsonConvert.SerializeObject(view);
             Assert.Equal(JsonConvert.SerializeObject(new
             {
-                started = model.Started.ToString("o")
+                started = model.Started
             }), serialized);
         }
     }
