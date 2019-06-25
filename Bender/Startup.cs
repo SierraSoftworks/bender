@@ -61,7 +61,6 @@ namespace Bender
             });
 
             services.AddMvc()
-                .AddNewtonsoftJson()
                 .AddMvcOptions(options =>
                 {
                     options.RespectBrowserAcceptHeader = true;
