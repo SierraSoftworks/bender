@@ -56,7 +56,7 @@ namespace Bender
             {
                 options.AddDefaultPolicy(builder =>
                 {
-                    builder.AllowAnyOrigin();
+                    builder.AllowAnyOrigin().WithMethods("GET");
                 });
             });
 
@@ -84,16 +84,8 @@ namespace Bender
                 app.UseHttpsRedirection();
             }
 
-            app.UseCors(policy => policy.AllowAnyOrigin().WithMethods("GET"));
-
-            app.UseCors();
-            app.Use((context, next) =>
-            {
-                context.Items["__CorsMiddlewareInvoked"] = true;
-                return next();
-            });
-
             app.UseRouting()
+                .UseCors()
                 .UseResponseCompression()
                 .UseEndpoints(routes => routes.MapControllers());
 
