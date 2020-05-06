@@ -82,6 +82,8 @@ extends:
     staging:
       namespace: bender-staging
       environment: staging-bender-sierrasoftworks-com.bender-staging
+      healthcheck: https://staging.bender.sierrasoftworks.com/api/v1/quote
     production:
       namespace: bender-prod
       environment: bender-sierrasoftworks-com.bender-prod
+      healthcheck: https://bender.sierrasoftworks.com/api/v1/quote
