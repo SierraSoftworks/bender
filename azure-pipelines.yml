@@ -1,0 +1,134 @@
+trigger:
+- master
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  tag: "$(Build.BuildId)"
+  image: sierrasoftworks/bender
+  namespace.staging: bender-staging
+  namespace.prod: bender-prod
+  "dotnetcore.version": "3.1.201"
+  "dotnetcore.runtime": "linux-x64"
+
+stages:
+  - stage: build
+    displayName: Build
+    jobs:
+      - job: build_package
+        displayName: Build App Package
+        steps:
+          - task: GitVersion@5
+            displayName: GitVersion
+            inputs:
+              updateAssemblyInfo: true
+              preferBundledVersion: false
+
+          - task: UseDotNet@2
+            displayName: Use .NET Core SDK $(dotnetcore.version)
+            inputs:
+              version: $(dotnetcore.version)
+
+          - task: DotNetCoreCLI@2
+            displayName: Restore Dependencies
+            inputs:
+              command: restore
+
+          - task: DotNetCoreCLI@2
+            displayName: Run Tests
+            inputs:
+              command: test
+              arguments: '--collect "Code coverage"'
+              testRunTitle: "General Tests"
+
+          - task: DotNetCoreCLI@2
+            displayName: Build Package
+            inputs:
+              command: publish
+              publishWebProjects: false
+              projects: Bender/Bender.csproj
+              arguments: "-o out --self-contained --runtime $(dotnetcore.runtime)"
+
+          - task: PublishSymbols@2
+            displayName: "Publish Symbols"
+            inputs:
+              SymbolServerType: TeamServices
+              SymbolsProduct: "$(Build.DefinitionName)"
+              SymbolsVersion: "$(GitVersion.SemVer)"
+
+          - publish: ./out
+            artifact: package
+
+      - job: build_docker
+        displayName: Build Docker Image
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: Docker@2
+            displayName: Build Docker Image
+            inputs:
+              command: buildAndPush
+              repository: $(image)
+              Dockerfile: "Dockerfile"
+              containerRegistry: Docker Hub
+              tags: |
+                latest
+                $(tag)
+
+          - publish: ./.deploy
+            artifact: manifests
+
+  - stage: deploy_staging
+    displayName: Deploy (Staging)
+    dependsOn:
+      - build
+    jobs:
+      - deployment: deploy_staging
+        displayName: Deploy Staging
+        environment: staging-bender-sierrasoftworks-com.bender-staging
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: KubernetesManifest@0
+                  name: deploy
+                  displayName: Deploy 
+                  inputs:
+                    action: deploy
+                    namespace: $(namespace.staging)
+                    manifests: $(Pipeline.Workspace)/manifests/*.yml
+
+                    containers: |
+                      $(image):$(tag)
+            postRouteTraffic:
+              steps:
+                - pwsh: Invoke-WebRequest -UseBasicParsing https://staging.bender.sierrasoftworks.com/api/v1/health
+                  displayName: Confirm Website is Available
+
+  - stage: deploy_prod
+    displayName: Deploy (Production)
+    dependsOn:
+      - build
+      - deploy_staging
+    jobs:
+      - deployment: deploy_prod
+        displayName: Deploy Production
+        environment: bender-sierrasoftworks-com.bender-prod
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: KubernetesManifest@0
+                  name: deploy
+                  displayName: Deploy 
+                  inputs:
+                    action: deploy
+                    namespace: $(namespace.prod)
+                    manifests: $(Pipeline.Workspace)/manifests/*.yml
+                    containers: |
+                      $(image):$(tag)
+            postRouteTraffic:
+              steps:
+                - pwsh: Invoke-WebRequest -UseBasicParsing https://bender.sierrasoftworks.com/api/v1/health
+                  displayName: Confirm Website is Available

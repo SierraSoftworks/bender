@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bender-server
+  labels:
+    app.kubernetes.io/name: bender
+    app.kubernetes.io/instance: bender-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: bender
+      app.kubernetes.io/instance: bender-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bender
+        app.kubernetes.io/instance: bender-server
+        aadpodidbinding: bender
+    spec:
+      containers:
+        - name: server
+          image: sierrasoftworks/bender:latest
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              cpu: 50m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 500Mi
+          env:
+            - name: ENVIRONMENT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              port: http
+              path: /api/v1/health
+            initialDelaySeconds: 5
+            periodSeconds: 1
+          livenessProbe:
+            httpGet:
+              port: http
+              path: /api/v1/health
+            initialDelaySeconds: 30
+            periodSeconds: 1

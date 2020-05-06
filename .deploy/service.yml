@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bender-server
+spec:
+  selector:
+    app.kubernetes.io/name: bender
+    app.kubernetes.io/instance: bender-server
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
