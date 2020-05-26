@@ -1,7 +1,9 @@
 pub mod health;
 pub mod quote;
+pub mod error;
 
 pub use quote::{Quote, QuotesState};
+pub use error::APIError;
 
 use actix_web::{web, App, dev, error::Error};
 use actix_service::ServiceFactory;
