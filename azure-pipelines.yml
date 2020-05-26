@@ -4,8 +4,6 @@ trigger:
 variables:
   tag: '$(Build.BuildId)'
   image: sierrasoftworks/bender
-  "dotnetcore.version": "3.1.201"
-  "dotnetcore.runtime": "linux-x64"
 
 resources:
   repositories:
@@ -18,51 +16,6 @@ extends:
   template: kubernetes/app.yml@templates
   parameters:
     build:
-      - job: build_package
-        displayName: Build App Package
-        pool:
-          vmImage: windows-latest
-        steps:
-          - task: GitVersion@5
-            displayName: GitVersion
-            inputs:
-              updateAssemblyInfo: true
-              preferBundledVersion: false
-
-          - task: UseDotNet@2
-            displayName: Use .NET Core SDK $(dotnetcore.version)
-            inputs:
-              version: $(dotnetcore.version)
-
-          - task: DotNetCoreCLI@2
-            displayName: Restore Dependencies
-            inputs:
-              command: restore
-
-          - task: DotNetCoreCLI@2
-            displayName: Run Tests
-            inputs:
-              command: test
-              arguments: '--collect "Code coverage"'
-              testRunTitle: "General Tests"
-
-          - task: DotNetCoreCLI@2
-            displayName: Build Package
-            inputs:
-              command: publish
-              publishWebProjects: false
-              projects: Bender/Bender.csproj
-              arguments: "-o out --self-contained --runtime $(dotnetcore.runtime)"
-
-          - task: PublishSymbols@2
-            displayName: "Publish Symbols"
-            inputs:
-              SymbolServerType: TeamServices
-              SymbolsProduct: "$(Build.DefinitionName)"
-              SymbolsVersion: "$(GitVersion.SemVer)"
-
-          - publish: ./out
-            artifact: package
       - job: build_docker
         displayName: Build Docker Image
         steps:
