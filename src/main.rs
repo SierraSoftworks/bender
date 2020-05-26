@@ -10,33 +10,27 @@ extern crate tokio;
 extern crate rand;
 
 use actix_cors::Cors;
-use actix_web::{middleware, web, App, HttpServer};
+use actix_web::{middleware, App, HttpServer};
 
 mod api;
 mod store;
 
-use store::Loader;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    let health_state = web::Data::new(api::health::HealthState::new());
-    let quote_state = web::Data::new(api::quote::QuotesState::new());
+    let state = api::GlobalStateManager::new();
 
     println!("Loading quotes from ./quotes.json");
-    let loader = store::file::FileLoader{
+    store::load_global_state(&store::file::FileLoader {
         path: std::path::PathBuf::from("./quotes.json"),
-    };
-    loader.load_quotes(&quote_state).await?;
+    }, &state).await?;
 
     println!("Starting server on :8000");
     HttpServer::new(move || {
-        App::new()
-            .app_data(health_state.clone())
-            .app_data(quote_state.clone())
+        state.configure(App::new())
             .wrap(middleware::Logger::default())
             .wrap(Cors::new().send_wildcard().allowed_origin("All").finish())
-            .configure(api::health::configure)
-            .configure(api::quote::configure)
+            .configure(api::configure)
     })
     .bind("0.0.0.0:8000")?
     .run()
