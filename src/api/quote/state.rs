@@ -31,7 +31,7 @@ impl<'a> QuotesState {
     pub async fn quote_by<T: StateView<Quote>>(&self, person: &str) -> Option<T> {
         let qs = self.quotes.read().await;
 
-        let q = qs.iter().filter(|x| x.who == person).choose(&mut rand::thread_rng());
+        let q = qs.iter().filter(|x| x.who.to_lowercase() == person.to_lowercase()).choose(&mut rand::thread_rng());
 
         q.map(T::from_state)
     }
