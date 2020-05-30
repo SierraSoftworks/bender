@@ -17,13 +17,11 @@ use prometheus::default_registry;
 mod api;
 mod store;
 
-
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let state = api::GlobalStateManager::new();
     let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();
 
-    println!("Loading quotes from ./quotes.json");
     store::load_global_state(&store::file::FileLoader {
         path: std::path::PathBuf::from("./quotes.json"),
     }, &state).await?;

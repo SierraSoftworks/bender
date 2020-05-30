@@ -1,5 +1,5 @@
 use super::{Loader, Quote, QuotesState, StateView};
-use std::{fs::File, path::PathBuf, io::Result};
+use std::{fs::File, path::PathBuf, error::Error};
 
 pub struct FileLoader {
     pub path: PathBuf,
@@ -7,7 +7,8 @@ pub struct FileLoader {
 
 #[async_trait::async_trait]
 impl Loader for FileLoader {
-    async fn load_quotes(&self, state: &QuotesState) -> Result<()> {
+    async fn load_quotes(&self, state: &QuotesState) -> Result<(), Box<dyn Error>> {
+        println!("Loading quotes from {}", self.path.display());
         let f = File::open(self.path.clone())?;
         let fc: Vec<FileQuoteV1> = serde_json::from_reader(f)?;
 
