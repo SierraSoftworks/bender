@@ -9,7 +9,9 @@ pub use self::state::{Quote, QuotesState};
 use super::APIError;
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
-    cfg.service(quote_v1).service(quote_by_v1);
+    cfg
+        .service(quote_v1)
+        .service(quote_by_v1);
 }
 
 #[get("/api/v1/quote")]

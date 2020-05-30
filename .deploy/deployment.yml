@@ -18,6 +18,10 @@ spec:
         app.kubernetes.io/name: bender
         app.kubernetes.io/instance: bender-server
         aadpodidbinding: bender
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/api/v1/metrics"
     spec:
       containers:
         - name: server

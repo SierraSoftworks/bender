@@ -1,6 +1,6 @@
 pub mod file;
 
-use super::api::{GlobalStateManager, Quote, QuotesState};
+use super::api::{GlobalStateManager, Quote, QuotesState, StateView};
 use std::io::Result;
 
 #[async_trait::async_trait]
