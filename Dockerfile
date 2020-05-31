@@ -10,15 +10,25 @@ RUN cargo build --release
 RUN rm src/*.rs
 RUN rm ./target/release/deps/bender*
 
-# Build the rest of the project
+# Add the source code
 COPY . .
-RUN cargo build --release --target-dir /out
-RUN cargo test --release --target-dir /out
+
+# Run the test suite
+RUN cargo test --release
+RUN rm /src/target/release/deps/bender*
+
+
+# Build the rest of the project
+RUN cargo build --release --bin bender
+
+# Ensure that the binary is at a known location for the next stage
+RUN rm /src/target/release/deps/bender*.d
+RUN cp /src/target/release/deps/bender* /src/target/release/deps/bender
 
 FROM debian:buster-slim
 #RUN apt-get update && apt-get install -y extra-runtime-dependencies
 
-COPY --from=0 /out/deps/bender /app/bender
+COPY --from=0 /src/target/release/deps/bender /app/bender
 ADD ./quotes.json /app/quotes.json
 
 WORKDIR /app
