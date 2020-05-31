@@ -30,6 +30,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         state.configure(App::new())
             .wrap(metrics.clone())
+            .wrap(Cors::new().finish())
             .wrap(middleware::Logger::default())
             .wrap(Cors::new().send_wildcard().allowed_origin("All").finish())
             .configure(api::configure)
