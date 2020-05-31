@@ -6,6 +6,7 @@ extern crate uuid;
 extern crate mime;
 extern crate tokio;
 extern crate rand;
+#[macro_use] extern crate log;
 #[macro_use] extern crate lazy_static;
 #[macro_use] extern crate prometheus;
 
@@ -19,6 +20,8 @@ mod store;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init();
+
     let state = api::GlobalStateManager::new();
     let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();
 
@@ -30,13 +33,10 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         state.configure(App::new())
             .wrap(metrics.clone())
-            .wrap(Cors::new()
-                .allowed_origin("All")
-                .send_wildcard()
-                .allowed_methods(vec!["GET"])
-                .finish())
             .wrap(middleware::Logger::default())
-            .wrap(Cors::new().send_wildcard().allowed_origin("All").finish())
+            .wrap(Cors::new()
+                .send_wildcard()
+                .finish())
             .configure(api::configure)
     })
     .bind("0.0.0.0:8000")?
