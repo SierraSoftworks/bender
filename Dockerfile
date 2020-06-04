@@ -28,6 +28,8 @@ RUN cp /src/target/release/deps/bender* /src/target/release/deps/bender
 FROM debian:buster-slim
 #RUN apt-get update && apt-get install -y extra-runtime-dependencies
 
+RUN apt-get update && apt-get install -y libssl1.1
+
 COPY --from=0 /src/target/release/deps/bender /app/bender
 ADD ./quotes.json /app/quotes.json
 
