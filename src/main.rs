@@ -45,7 +45,7 @@ async fn main() -> std::io::Result<()> {
     println!("Starting server on :8000");
     HttpServer::new(move || {
         App::new()
-            .app_data(state.clone())
+            .data(state.clone())
             .wrap(metrics.clone())
             .wrap(middleware::Logger::default())
             .wrap(Cors::new()
