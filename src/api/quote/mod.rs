@@ -1,12 +1,11 @@
 mod models;
-mod state;
 #[cfg(test)]
 mod test;
 
 use actix_web::{get, web, HttpRequest, Result};
 
-pub use self::state::{Quote, QuotesState};
-use super::APIError;
+use crate::models::*;
+use super::{GlobalState, APIError, StateView};
 
 pub fn configure(cfg: &mut web::ServiceConfig) {
     cfg
@@ -15,11 +14,15 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 }
 
 #[get("/api/v1/quote")]
-pub async fn quote_v1(state: web::Data<state::QuotesState>) -> Result<models::QuoteV1, APIError> {
-    state.quote().await.ok_or(APIError::new(404, "Not Found", "No quotes were present in the collection."))
+pub async fn quote_v1(state: web::Data<GlobalState>) -> Result<models::QuoteV1, APIError> {
+    state.store.send(GetQuote{
+        who: "".to_string(),
+    }).await?.map(|q| models::QuoteV1::from_state(&q))
 }
 
 #[get("/api/v1/quote/{person}")]
-pub async fn quote_by_v1(state: web::Data<state::QuotesState>, request: HttpRequest) -> Result<models::QuoteV1, APIError> {
-    state.quote_by(request.match_info().get("person").unwrap()).await.ok_or(APIError::new(404, "Not Found", "No quotes were present for the provided author."))
+pub async fn quote_by_v1(state: web::Data<GlobalState>, request: HttpRequest) -> Result<models::QuoteV1, APIError> {
+    state.store.send(GetQuote{
+        who: request.match_info().get("person").unwrap().to_string()
+    }).await?.map(|q| models::QuoteV1::from_state(&q))
 }

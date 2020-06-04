@@ -17,6 +17,7 @@ use actix_web_prom::PrometheusMetrics;
 use prometheus::default_registry;
 
 mod api;
+mod models;
 mod store;
 
 #[actix_rt::main]
@@ -34,7 +35,7 @@ async fn main() -> std::io::Result<()> {
         sentry::integrations::panic::register_panic_handler();
     }
 
-    let state = api::GlobalStateManager::new();
+    let state = api::GlobalState::new();
     let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();
 
     store::load_global_state(&store::file::FileLoader {
@@ -43,7 +44,8 @@ async fn main() -> std::io::Result<()> {
 
     println!("Starting server on :8000");
     HttpServer::new(move || {
-        state.configure(App::new())
+        App::new()
+            .app_data(state.clone())
             .wrap(metrics.clone())
             .wrap(middleware::Logger::default())
             .wrap(Cors::new()

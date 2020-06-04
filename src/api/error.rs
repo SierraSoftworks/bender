@@ -35,3 +35,15 @@ impl fmt::Display for APIError {
         write!(f, "[HTTP {} {}] {}", self.code, self.error, self.message)
     }
 }
+
+impl From<actix::MailboxError> for APIError {
+    fn from(_: actix::MailboxError) -> Self {
+        sentry::capture_event(sentry::protocol::Event {
+            message: Some("Failed to send message to Actix Actor".into()),
+            level: sentry::protocol::Level::Error,
+            ..Default::default()
+        });
+
+        Self::new(500, "Internal Server Error", "We ran into a problem, this has been reported and will be looked at.")
+    }
+}

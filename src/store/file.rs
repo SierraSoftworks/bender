@@ -1,4 +1,6 @@
-use super::{Loader, Quote, QuotesState, StateView};
+use actix::prelude::*;
+use super::{Loader, StateView, Store};
+use crate::models::*;
 use std::{fs::File, path::PathBuf, error::Error};
 
 pub struct FileLoader {
@@ -7,13 +9,22 @@ pub struct FileLoader {
 
 #[async_trait::async_trait]
 impl Loader for FileLoader {
-    async fn load_quotes(&self, state: &QuotesState) -> Result<(), Box<dyn Error>> {
+    async fn load_quotes(&self, state: Addr<Store>) -> Result<(), Box<dyn Error>> {
         println!("Loading quotes from {}", self.path.display());
         let f = File::open(self.path.clone())?;
         let fc: Vec<FileQuoteV1> = serde_json::from_reader(f)?;
 
         for q in fc {
-            state.add_quote(&q).await;
+            match state.send(AddQuote{
+                quote: q.quote,
+                who: q.who,
+            }).await? {
+                Ok(_) => {},
+                Err(err) => {
+                    error!("Failed to load quotes from {}: {}", self.path.display(), err);
+                    return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, format!("{}", err))))
+                },
+            }
         }
 
         Ok(())
@@ -52,16 +63,12 @@ mod tests {
             path: get_dev_dir().join("quotes.json"),
         };
 
-        let state = QuotesState::new();
-        loader.load_quotes(&state).await.unwrap();
+        let state = Store::new().start();
+        loader.load_quotes(state.clone()).await.unwrap();
 
-        let qs = state.quotes.read().await;
-        assert!(qs.len() > 0);
-
-        for q in qs.iter() {
-            assert_ne!(q.who, "");
-            assert_ne!(q.quote, "");
-        }
+        state.send(GetQuote{who:"".to_string()}).await.expect("the actor should respond").expect("we should get a quote");
+        state.send(GetQuote{who:"Bender".to_string()}).await.expect("the actor should respond").expect("we should get a quote");
+        state.send(GetQuote{who:"bEnDeR".to_string()}).await.expect("the actor should respond").expect("we should get a quote");
     }
 
     fn get_dev_dir() -> PathBuf {

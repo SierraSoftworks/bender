@@ -1,5 +1,5 @@
 use super::super::StateView;
-use super::state;
+use crate::models::Quote;
 
 use actix_web::{Error, HttpRequest, HttpResponse, Responder, http::header, http::header::Header};
 use futures::future::{ready, Ready};
@@ -21,15 +21,15 @@ pub struct QuoteV1 {
     pub who: String,
 }
 
-impl StateView<state::Quote> for QuoteV1 {
-    fn to_state(&self) -> state::Quote {
-        state::Quote {
+impl StateView<Quote> for QuoteV1 {
+    fn to_state(&self) -> Quote {
+        Quote {
             quote: self.quote.clone(),
             who: self.who.clone(),
         }
     }
 
-    fn from_state(state: &state::Quote) -> Self {
+    fn from_state(state: &Quote) -> Self {
         Self {
             quote: state.quote.clone(),
             who: state.who.clone(),
