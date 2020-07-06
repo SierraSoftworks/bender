@@ -23,17 +23,13 @@ mod store;
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
-    let raven = sentry::init((
+    let _raven = sentry::init((
         "https://950ba56ab61a4abcb3679b1117158c33@o219072.ingest.sentry.io/1362607",
         sentry::ClientOptions {
             release: release_name!(),
             ..Default::default()
         },
     ));
-
-    if raven.is_enabled() {
-        sentry::integrations::panic::register_panic_handler();
-    }
 
     let state = api::GlobalState::new();
     let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();
