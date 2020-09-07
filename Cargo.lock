@@ -304,14 +304,14 @@ dependencies = [
 
 [[package]]
 name = "actix-web-prom"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abf286ef30e1cf7f274845fb1270efa1bf949f280fc654e060f1252e4076d0ea"
+checksum = "39cb9a73c670c43e496bcbd5476062a3eb6760209777d5ba364105be65809761"
 dependencies = [
  "actix-service",
  "actix-web",
  "futures",
- "prometheus",
+ "prometheus 0.9.0",
 ]
 
 [[package]]
@@ -540,7 +540,7 @@ dependencies = [
  "lazy_static",
  "log",
  "mime",
- "prometheus",
+ "prometheus 0.8.0",
  "rand 0.7.3",
  "sentry",
  "serde",
@@ -1557,6 +1557,19 @@ dependencies = [
  "fnv",
  "lazy_static",
  "protobuf",
+ "spin",
+ "thiserror",
+]
+
+[[package]]
+name = "prometheus"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd0ced56dee39a6e960c15c74dc48849d614586db2eaada6497477af7c7811cd"
+dependencies = [
+ "cfg-if",
+ "fnv",
+ "lazy_static",
  "spin",
  "thiserror",
 ]
