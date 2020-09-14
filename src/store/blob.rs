@@ -16,9 +16,9 @@ pub struct BlobLoader {
 #[async_trait::async_trait]
 impl Loader for BlobLoader {
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), Box<dyn Error>> {
-        let client = Client::from_connection_string(self.connection_string.as_str())?;
+        let blob_client = client::from_connection_string(self.connection_string.as_str())?;
 
-        let blob = client
+        let blob = blob_client
                     .get_blob()
                     .with_container_name(self.container.as_str())
                     .with_blob_name(self.path.to_string_lossy().to_string().as_str())
