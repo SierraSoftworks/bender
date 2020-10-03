@@ -305,6 +305,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-web-opentelemetry"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "efeefd6473a1a03037e42afd8483146ce0f5c58ba8076c4c11fd20c5a4ed6bc7"
+dependencies = [
+ "actix-http",
+ "actix-web",
+ "futures",
+ "opentelemetry",
+ "serde",
+]
+
+[[package]]
 name = "actix-web-prom"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -315,7 +328,7 @@ dependencies = [
  "actix-web",
  "futures",
  "pin-project",
- "prometheus",
+ "prometheus 0.10.0",
 ]
 
 [[package]]
@@ -533,6 +546,7 @@ dependencies = [
  "actix-rt",
  "actix-service",
  "actix-web",
+ "actix-web-opentelemetry",
  "actix-web-prom",
  "async-trait",
  "azure_sdk_core",
@@ -545,7 +559,8 @@ dependencies = [
  "lazy_static",
  "log",
  "mime",
- "prometheus",
+ "opentelemetry",
+ "prometheus 0.10.0",
  "rand 0.7.3",
  "sentry",
  "serde",
@@ -1546,6 +1561,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "opentelemetry"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "acbf68b6b34b5d869342732c0dc05f74b7bdb4f17f2302d16d799231a6106441"
+dependencies = [
+ "futures",
+ "lazy_static",
+ "percent-encoding",
+ "pin-project",
+ "prometheus 0.7.0",
+ "rand 0.7.3",
+]
+
+[[package]]
 name = "parking_lot"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1640,6 +1669,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36e28516df94f3dd551a587da5357459d9b36d945a7c37c3557928c1c2ff2a2c"
 dependencies = [
  "unicode-xid",
+]
+
+[[package]]
+name = "prometheus"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5567486d5778e2c6455b1b90ff1c558f29e751fc018130fa182e15828e728af1"
+dependencies = [
+ "cfg-if",
+ "fnv",
+ "lazy_static",
+ "protobuf",
+ "quick-error",
+ "spin",
 ]
 
 [[package]]

@@ -13,6 +13,7 @@ extern crate rand;
 
 use actix_cors::Cors;
 use actix_web::{middleware, App, HttpServer};
+use actix_web_opentelemetry::{RequestTracing};
 use actix_web_prom::PrometheusMetrics;
 use prometheus::default_registry;
 
@@ -31,6 +32,9 @@ async fn main() -> std::io::Result<()> {
         },
     ));
 
+    // TODO: Update this to use a valid trace provider
+    opentelemetry::global::set_provider(opentelemetry::api::NoopProvider{});
+
     let state = api::GlobalState::new();
     let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();
 
@@ -43,6 +47,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(state.clone())
             .wrap(metrics.clone())
+            .wrap(RequestTracing::default())
             .wrap(middleware::Logger::default())
             .wrap(Cors::new()
                 .send_wildcard()
