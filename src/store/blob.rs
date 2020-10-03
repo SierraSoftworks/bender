@@ -3,6 +3,9 @@ use super::{Loader, StateView, Store};
 use crate::models::*;
 use std::{path::PathBuf, error::Error};
 
+use opentelemetry::api::Tracer;
+use opentelemetry::global;
+
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
 use azure_sdk_storage_core::prelude::*;
@@ -16,8 +19,11 @@ pub struct BlobLoader {
 #[async_trait::async_trait]
 impl Loader for BlobLoader {
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), Box<dyn Error>> {
+        let _span = global::tracer("blob-storage").start("create-client");
+
         let blob_client = client::from_connection_string(self.connection_string.as_str())?;
 
+        let _span = global::tracer("blob-storage").start("download");
         let blob = blob_client
                     .get_blob()
                     .with_container_name(self.container.as_str())
@@ -25,9 +31,11 @@ impl Loader for BlobLoader {
                     .finalize()
                     .await?;
 
+        let _span = global::tracer("blob-storage").start("deserialize");
 
         let fc: Vec<BlobQuoteV1> = serde_json::from_slice(&blob.data)?;
 
+        let _span = global::tracer("blob-storage").start("update-state");
         for q in fc {
             match state.send(AddQuote{
                 quote: q.quote,

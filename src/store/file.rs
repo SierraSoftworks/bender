@@ -2,6 +2,8 @@ use actix::prelude::*;
 use super::{Loader, StateView, Store};
 use crate::models::*;
 use std::{fs::File, path::PathBuf, error::Error};
+use opentelemetry::api::Tracer;
+use opentelemetry::global;
 
 pub struct FileLoader {
     pub path: PathBuf,
@@ -11,9 +13,12 @@ pub struct FileLoader {
 impl Loader for FileLoader {
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), Box<dyn Error>> {
         println!("Loading quotes from {}", self.path.display());
+        let _span = global::tracer("file-storage").start("open-file");
         let f = File::open(self.path.clone())?;
+        let _span = global::tracer("file-storage").start("deserialize");
         let fc: Vec<FileQuoteV1> = serde_json::from_reader(f)?;
 
+        let _span = global::tracer("file-storage").start("update-state");
         for q in fc {
             match state.send(AddQuote{
                 quote: q.quote,

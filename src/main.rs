@@ -15,11 +15,37 @@ use actix_cors::Cors;
 use actix_web::{middleware, App, HttpServer};
 use actix_web_opentelemetry::{RequestTracing};
 use actix_web_prom::PrometheusMetrics;
+use opentelemetry::api::Key;
 use prometheus::default_registry;
 
 mod api;
 mod models;
 mod store;
+
+fn init_opentelemetry() {
+    match std::env::var("JAEGER_COLLECTOR_ENDPOINT") {
+        Ok(endpoint) => {
+            let exporter = opentelemetry_jaeger::Exporter::builder()
+                .with_collector_endpoint(endpoint)
+                .with_process(opentelemetry_jaeger::Process {
+                    service_name: "bender".to_string(),
+                    tags: vec![
+                        Key::new("release").string((release_name!()).unwrap_or("dev".into()))
+                    ]
+                }).init().unwrap();
+            
+            let provider = opentelemetry::sdk::Provider::builder()
+                .with_simple_exporter(exporter)
+                .with_config(opentelemetry::sdk::Config {
+                    default_sampler: Box::new(opentelemetry::sdk::Sampler::AlwaysOn),
+                    ..Default::default()
+                }).build();
+
+            opentelemetry::global::set_provider(provider);
+        },
+        Err(_) => opentelemetry::global::set_provider(opentelemetry::api::NoopProvider{})
+    };
+}
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -32,8 +58,7 @@ async fn main() -> std::io::Result<()> {
         },
     ));
 
-    // TODO: Update this to use a valid trace provider
-    opentelemetry::global::set_provider(opentelemetry::api::NoopProvider{});
+    init_opentelemetry();
 
     let state = api::GlobalState::new();
     let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();

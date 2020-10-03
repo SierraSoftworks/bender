@@ -43,6 +43,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: JAEGER_COLLECTOR_ENDPOINT
+              value: http://otel-collector.opentelemetry:14268/api/traces
           ports:
             - name: http
               containerPort: 8000
