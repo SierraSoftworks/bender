@@ -21,7 +21,7 @@ lazy_static! {
         ).unwrap();
 
     static ref UP_GAUGE: IntGauge =
-        register_int_gauge!("up", "The time at which the application was first started.").unwrap();
+        register_int_gauge!("process_start_time_seconds", "The time at which the application was first started.").unwrap();
 }
 
 pub struct MemoryStore {
