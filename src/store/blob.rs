@@ -3,6 +3,7 @@ use tracing::{Level, event, instrument, span};
 use tracing_futures::Instrument;
 use super::{Loader, StateView, Store};
 use crate::models::*;
+use crate::telemetry::*;
 use std::{path::PathBuf, error::Error};
 
 use azure_sdk_core::prelude::*;

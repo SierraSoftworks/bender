@@ -4,6 +4,7 @@ mod test;
 
 use actix_web::{get, web};
 use tracing::{instrument};
+use crate::telemetry::*;
 
 use crate::models::*;
 use super::{StateView, APIError};

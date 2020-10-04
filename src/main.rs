@@ -20,10 +20,12 @@ use tracing_log::LogTracer;
 use tracing_actix_web::TracingLogger;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::Registry;
+use crate::telemetry::OpenTelemetryB3;
 
 mod api;
 mod models;
 mod store;
+mod telemetry;
 
 fn init_opentelemetry() {
     match std::env::var("JAEGER_COLLECTOR_ENDPOINT") {
@@ -57,7 +59,10 @@ fn init_opentelemetry() {
         },
         _ => {
             opentelemetry::global::set_provider(opentelemetry::api::NoopProvider{});
-            tracing_subscriber::fmt::init();
+            tracing_subscriber::fmt()
+                .with_max_level(tracing::Level::INFO)
+                .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE)
+                .init();
         }
     };
 
@@ -65,7 +70,8 @@ fn init_opentelemetry() {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    LogTracer::init().unwrap();
+    init_opentelemetry();
+    LogTracer::init().unwrap_or_default();
 
     let _raven = sentry::init((
         "https://950ba56ab61a4abcb3679b1117158c33@o219072.ingest.sentry.io/1362607",
@@ -75,7 +81,6 @@ async fn main() -> std::io::Result<()> {
         },
     ));
 
-    init_opentelemetry();
 
     let state = api::GlobalState::new();
     let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();
@@ -90,6 +95,7 @@ async fn main() -> std::io::Result<()> {
             .data(state.clone())
             .wrap(metrics.clone())
             .wrap(TracingLogger)
+            .wrap(OpenTelemetryB3)
             .wrap(Cors::new()
                 .send_wildcard()
                 .finish())

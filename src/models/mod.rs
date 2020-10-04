@@ -1,14 +1,12 @@
 mod stateview;
 mod health;
 mod quote;
-mod trace_message;
 
 use actix::prelude::*;
 
 pub use quote::*;
 pub use health::*;
 pub use stateview::*;
-pub use trace_message::*;
 
 #[derive(Clone)]
 pub struct GlobalState {
