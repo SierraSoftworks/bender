@@ -20,7 +20,7 @@ async fn quote_v1_found_status() {
     
     state.store.send(AddQuote{
         who: "Bender".to_string(),
-        quote: "Bite my shiny metal ass!".to_string()
+        quote: "Bite my shiny metal ass!".to_string(),
     }).await.expect("The actor should respond").expect("The quote should have been added to the store");
 
     let mut app = test::init_service(App::new().data(state).configure(configure)).await;
@@ -37,7 +37,7 @@ async fn quote_v1_content() {
     
     state.store.send(AddQuote{
         who: "Bender".to_string(),
-        quote: "Bite my shiny metal ass!".to_string()
+        quote: "Bite my shiny metal ass!".to_string(),
     }).await.expect("The actor should respond").expect("The quote should have been added to the store");
 
     let mut app = test::init_service(App::new().data(state).configure(configure)).await;

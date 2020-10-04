@@ -1,10 +1,9 @@
 use actix::prelude::*;
+use tracing::{Level, event, instrument, span};
+use tracing_futures::Instrument;
 use super::{Loader, StateView, Store};
 use crate::models::*;
 use std::{path::PathBuf, error::Error};
-
-use opentelemetry::api::{KeyValue, Span, StatusCode, Tracer};
-use opentelemetry::global;
 
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
@@ -18,49 +17,40 @@ pub struct BlobLoader {
 
 #[async_trait::async_trait]
 impl Loader for BlobLoader {
+    #[instrument(err, skip(self, state))]
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), Box<dyn Error>> {
-        let span = global::tracer("blob-storage").start("load-quotes");
-
-        span.set_attribute(KeyValue::new("db.type", "azure-blob"));
-        span.set_attribute(KeyValue::new("db.instance", format!("{}", self.container)));
-        span.set_attribute(KeyValue::new("db.statement", format!("GET {}", self.path.display())));
-        
+        debug!("Initializing Azure Blob storage client");
         let blob_client = client::from_connection_string(self.connection_string.as_str())?;
-        span.add_event("client.init".into(), vec![]);
 
-        span.add_event("client.get.start".into(), vec![]);
+        debug!("Fetching {}", self.path.display());
         let blob = blob_client
                     .get_blob()
                     .with_container_name(self.container.as_str())
                     .with_blob_name(self.path.to_string_lossy().to_string().as_str())
                     .finalize()
+                    .instrument(span!(Level::INFO, "get_blob", db.instance = self.container.as_str(), db.statement = format!("GET {}", self.path.display()).as_str()))
                     .await?;
-        span.add_event("client.get.end".into(), vec![]);
 
-        span.add_event("deserialize.start".into(), vec![]);
-        let fc: Vec<BlobQuoteV1> = serde_json::from_slice(&blob.data)?;
-        span.add_event("deserialize.end".into(), vec![]);
-
-        span.add_event("store.update.start".into(), vec![]);
+        let fc: Vec<BlobQuoteV1> = span!(Level::DEBUG, "deserialize").in_scope(|| serde_json::from_slice(&blob.data) )?;
         let quote_count = fc.len();
+        info!("Received {} quotes from Azure blob storage", quote_count);
+
         for q in fc {
             match state.send(AddQuote{
                 quote: q.quote,
                 who: q.who,
-            }).await? {
+            }.trace())
+            .await? {
                 Ok(_) => {},
                 Err(err) => {
                     error!("Failed to load quotes from {}: {}", self.path.display(), err);
-                    span.set_status(StatusCode::NotFound, format!{"{:?}", err});
                     Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, format!("{}", err))))?;
                 },
             }
         }
-        span.add_event("store.update.end".into(), vec![]);
 
-        span.set_status(StatusCode::OK, format!("Loaded {} quotes into the state store.", quote_count));
-        span.end();
-        
+        event!(Level::INFO, "Loaded {} quotes into the state store.", quote_count);
+
         Ok(())
     }
 }
