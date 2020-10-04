@@ -1,9 +1,8 @@
 use actix::prelude::*;
+use tracing::{Level, event, info_span, instrument};
 use super::{Loader, StateView, Store};
 use crate::models::*;
 use std::{fs::File, path::PathBuf, error::Error};
-use opentelemetry::api::{KeyValue, Span, StatusCode, Tracer};
-use opentelemetry::global;
 
 pub struct FileLoader {
     pub path: PathBuf,
@@ -11,39 +10,33 @@ pub struct FileLoader {
 
 #[async_trait::async_trait]
 impl Loader for FileLoader {
+    #[instrument(err, skip(self, state))]
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), Box<dyn Error>> {
-        println!("Loading quotes from {}", self.path.display());
-        let span = global::tracer("file-storage").start("load-quotes");
-        span.set_attribute(KeyValue::new("db.type", "file"));
-        span.set_attribute(KeyValue::new("db.statement", format!("GET {}", self.path.display())));
+        info!("Loading quotes from {}", self.path.display());
 
-        span.add_event("file.open.start".into(), vec![]);
+        debug!("Opening file");
         let f = File::open(self.path.clone())?;
-        span.add_event("file.open.end".into(), vec![]);
 
-        span.add_event("file.read.start".into(), vec![]);
-        let fc: Vec<FileQuoteV1> = serde_json::from_reader(f)?;
-        span.add_event("file.read.end".into(), vec![]);
-
-        span.add_event("store.update.start".into(), vec![]);
+        
+        let fc: Vec<FileQuoteV1> = info_span!("read_file").in_scope(|| serde_json::from_reader(f) )?;
         let quote_count = fc.len();
+        info!("Read {} quotes from file", quote_count);
+
         for q in fc {
             match state.send(AddQuote{
                 quote: q.quote,
                 who: q.who,
-            }).await? {
+            }.trace())
+            .await? {
                 Ok(_) => {},
                 Err(err) => {
                     error!("Failed to load quotes from {}: {}", self.path.display(), err);
-                    span.set_status(StatusCode::NotFound, format!{"{:?}", err});
                     Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, format!("{}", err))))?;
                 },
             }
         }
-        span.add_event("store.update.end".into(), vec![]);
 
-        span.set_status(StatusCode::OK, format!("Loaded {} quotes into the state store.", quote_count));
-        span.end();
+        event!(Level::INFO, "Loaded {} quotes into the state store.", quote_count);
 
         Ok(())
     }

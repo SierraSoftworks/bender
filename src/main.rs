@@ -12,11 +12,14 @@ extern crate rand;
 #[macro_use] extern crate prometheus;
 
 use actix_cors::Cors;
-use actix_web::{middleware, App, HttpServer};
-use actix_web_opentelemetry::{RequestTracing};
+use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetrics;
 use opentelemetry::api::Key;
 use prometheus::default_registry;
+use tracing_log::LogTracer;
+use tracing_actix_web::TracingLogger;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::Registry;
 
 mod api;
 mod models;
@@ -24,7 +27,7 @@ mod store;
 
 fn init_opentelemetry() {
     match std::env::var("JAEGER_COLLECTOR_ENDPOINT") {
-        Ok(endpoint) => {
+        Ok(endpoint) if !endpoint.is_empty() => {
             let exporter = opentelemetry_jaeger::Exporter::builder()
                 .with_collector_endpoint(endpoint)
                 .with_process(opentelemetry_jaeger::Process {
@@ -45,14 +48,25 @@ fn init_opentelemetry() {
                 .build();
 
             opentelemetry::global::set_provider(provider);
+                    
+            let tracer = opentelemetry::global::tracer("bender");
+            let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+            let subscriber = Registry::default()
+                .with(telemetry);
+            tracing::subscriber::set_global_default(subscriber).unwrap_or_default();
         },
-        Err(_) => opentelemetry::global::set_provider(opentelemetry::api::NoopProvider{})
+        _ => {
+            opentelemetry::global::set_provider(opentelemetry::api::NoopProvider{});
+            tracing_subscriber::fmt::init();
+        }
     };
+
 }
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    env_logger::init();
+    LogTracer::init().unwrap();
+
     let _raven = sentry::init((
         "https://950ba56ab61a4abcb3679b1117158c33@o219072.ingest.sentry.io/1362607",
         sentry::ClientOptions {
@@ -75,8 +89,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(state.clone())
             .wrap(metrics.clone())
-            .wrap(RequestTracing::default())
-            .wrap(middleware::Logger::default())
+            .wrap(TracingLogger)
             .wrap(Cors::new()
                 .send_wildcard()
                 .finish())

@@ -8,7 +8,6 @@ pub struct Health {
 }
 
 pub struct GetHealth {
-    
 }
 
 impl Message for GetHealth {
