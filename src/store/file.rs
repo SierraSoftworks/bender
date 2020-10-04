@@ -2,6 +2,7 @@ use actix::prelude::*;
 use tracing::{Level, event, info_span, instrument};
 use super::{Loader, StateView, Store};
 use crate::models::*;
+use crate::telemetry::*;
 use std::{fs::File, path::PathBuf, error::Error};
 
 pub struct FileLoader {

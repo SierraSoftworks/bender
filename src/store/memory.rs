@@ -1,5 +1,6 @@
 use std::sync::{RwLock, Arc};
 use crate::{models::*, trace_handler};
+use crate::telemetry::*;
 use actix::prelude::*;
 use tracing::{info_span, instrument};
 use crate::api::APIError;

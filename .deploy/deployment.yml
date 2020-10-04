@@ -29,7 +29,7 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             requests:
-              cpu: 50m
+              cpu: 10m
               memory: 100Mi
             limits:
               cpu: 500m
@@ -44,7 +44,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: JAEGER_COLLECTOR_ENDPOINT
-              value: http://otel-collector.opentelemetry:14268/api/traces
+              value: http://otel-collector.open-telemetry:14268/api/traces?format=jaeger.thrift
           ports:
             - name: http
               containerPort: 8000

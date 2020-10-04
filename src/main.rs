@@ -20,10 +20,12 @@ use tracing_log::LogTracer;
 use tracing_actix_web::TracingLogger;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::Registry;
+use crate::telemetry::OpenTelemetryB3;
 
 mod api;
 mod models;
 mod store;
+mod telemetry;
 
 fn init_opentelemetry() {
     match std::env::var("JAEGER_COLLECTOR_ENDPOINT") {
@@ -90,6 +92,7 @@ async fn main() -> std::io::Result<()> {
             .data(state.clone())
             .wrap(metrics.clone())
             .wrap(TracingLogger)
+            .wrap(OpenTelemetryB3)
             .wrap(Cors::new()
                 .send_wildcard()
                 .finish())
