@@ -59,7 +59,9 @@ fn init_opentelemetry() {
         },
         _ => {
             opentelemetry::global::set_provider(opentelemetry::api::NoopProvider{});
-            tracing_subscriber::fmt::init();
+            tracing_subscriber::fmt()
+                .with_max_level(tracing::Level::INFO)
+                .init();
         }
     };
 
@@ -67,7 +69,8 @@ fn init_opentelemetry() {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    LogTracer::init().unwrap();
+    init_opentelemetry();
+    LogTracer::init().unwrap_or_default();
 
     let _raven = sentry::init((
         "https://950ba56ab61a4abcb3679b1117158c33@o219072.ingest.sentry.io/1362607",
@@ -77,7 +80,6 @@ async fn main() -> std::io::Result<()> {
         },
     ));
 
-    init_opentelemetry();
 
     let state = api::GlobalState::new();
     let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();
