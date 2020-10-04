@@ -61,6 +61,7 @@ fn init_opentelemetry() {
             opentelemetry::global::set_provider(opentelemetry::api::NoopProvider{});
             tracing_subscriber::fmt()
                 .with_max_level(tracing::Level::INFO)
+                .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE)
                 .init();
         }
     };
