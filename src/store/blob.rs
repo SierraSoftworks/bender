@@ -3,7 +3,7 @@ use super::{Loader, StateView, Store};
 use crate::models::*;
 use std::{path::PathBuf, error::Error};
 
-use opentelemetry::api::Tracer;
+use opentelemetry::api::{KeyValue, Span, StatusCode, Tracer};
 use opentelemetry::global;
 
 use azure_sdk_core::prelude::*;
@@ -19,23 +19,30 @@ pub struct BlobLoader {
 #[async_trait::async_trait]
 impl Loader for BlobLoader {
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), Box<dyn Error>> {
-        let _span = global::tracer("blob-storage").start("create-client");
+        let span = global::tracer("blob-storage").start("load-quotes");
 
+        span.set_attribute(KeyValue::new("db.type", "azure-blob"));
+        span.set_attribute(KeyValue::new("db.instance", format!("{}", self.container)));
+        span.set_attribute(KeyValue::new("db.statement", format!("GET {}", self.path.display())));
+        
         let blob_client = client::from_connection_string(self.connection_string.as_str())?;
+        span.add_event("client.init".into(), vec![]);
 
-        let _span = global::tracer("blob-storage").start("download");
+        span.add_event("client.get.start".into(), vec![]);
         let blob = blob_client
                     .get_blob()
                     .with_container_name(self.container.as_str())
                     .with_blob_name(self.path.to_string_lossy().to_string().as_str())
                     .finalize()
                     .await?;
+        span.add_event("client.get.end".into(), vec![]);
 
-        let _span = global::tracer("blob-storage").start("deserialize");
-
+        span.add_event("deserialize.start".into(), vec![]);
         let fc: Vec<BlobQuoteV1> = serde_json::from_slice(&blob.data)?;
+        span.add_event("deserialize.end".into(), vec![]);
 
-        let _span = global::tracer("blob-storage").start("update-state");
+        span.add_event("store.update.start".into(), vec![]);
+        let quote_count = fc.len();
         for q in fc {
             match state.send(AddQuote{
                 quote: q.quote,
@@ -44,10 +51,15 @@ impl Loader for BlobLoader {
                 Ok(_) => {},
                 Err(err) => {
                     error!("Failed to load quotes from {}: {}", self.path.display(), err);
-                    return Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, format!("{}", err))))
+                    span.set_status(StatusCode::NotFound, format!{"{:?}", err});
+                    Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, format!("{}", err))))?;
                 },
             }
         }
+        span.add_event("store.update.end".into(), vec![]);
+
+        span.set_status(StatusCode::OK, format!("Loaded {} quotes into the state store.", quote_count));
+        span.end();
         
         Ok(())
     }

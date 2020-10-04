@@ -30,16 +30,19 @@ fn init_opentelemetry() {
                 .with_process(opentelemetry_jaeger::Process {
                     service_name: "bender".to_string(),
                     tags: vec![
-                        Key::new("release").string((release_name!()).unwrap_or("dev".into()))
+                        Key::new("service.version").string((release_name!()).unwrap_or("dev".into()))
                     ]
-                }).init().unwrap();
+                })
+                .init()
+                .unwrap();
             
             let provider = opentelemetry::sdk::Provider::builder()
                 .with_simple_exporter(exporter)
                 .with_config(opentelemetry::sdk::Config {
                     default_sampler: Box::new(opentelemetry::sdk::Sampler::AlwaysOn),
                     ..Default::default()
-                }).build();
+                })
+                .build();
 
             opentelemetry::global::set_provider(provider);
         },
