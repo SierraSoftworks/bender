@@ -34,3 +34,17 @@ impl<T> TraceMessageExt for T where T : Message {
         }
     }
 }
+
+#[macro_export]
+macro_rules! trace_handler {
+    ($actor:ty, $message:ty, $result:ty) => {
+        impl Handler<TraceMessage<$message>> for $actor {
+            type Result = $result;
+
+            fn handle(&mut self, msg: TraceMessage<$message>, ctx: &mut Self::Context) -> Self::Result {
+                let _entered = msg.span.enter();
+                self.handle(msg.message, ctx)
+            }
+        }
+    };
+}

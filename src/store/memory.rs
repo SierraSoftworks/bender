@@ -1,5 +1,5 @@
 use std::sync::{RwLock, Arc};
-use crate::models::*;
+use crate::{models::*, trace_handler};
 use actix::prelude::*;
 use tracing::{info_span, instrument};
 use crate::api::APIError;
@@ -45,14 +45,7 @@ impl Actor for MemoryStore {
     type Context = Context<Self>;
 }
 
-impl Handler<TraceMessage<AddQuote>> for MemoryStore {
-    type Result = Result<(), APIError>;
-
-    fn handle(&mut self, msg: TraceMessage<AddQuote>, ctx: &mut Self::Context) -> Self::Result {
-        let _entered = msg.span.enter();
-        self.handle(msg.message, ctx)
-    }
-}
+trace_handler!(MemoryStore, AddQuote, Result<(), APIError>);
 
 impl Handler<AddQuote> for MemoryStore {
     type Result = Result<(), APIError>;
@@ -77,14 +70,7 @@ impl Handler<AddQuote> for MemoryStore {
     }
 }
 
-impl Handler<TraceMessage<GetQuote>> for MemoryStore {
-    type Result = Result<Quote, APIError>;
-
-    fn handle(&mut self, msg: TraceMessage<GetQuote>, ctx: &mut Self::Context) -> Self::Result {
-        let _entered = msg.span.enter();
-        self.handle(msg.message, ctx)
-    }
-}
+trace_handler!(MemoryStore, GetQuote, Result<Quote, APIError>);
 
 impl Handler<GetQuote> for MemoryStore {
     type Result = Result<Quote, APIError>;
@@ -118,14 +104,7 @@ impl Handler<GetQuote> for MemoryStore {
     }
 }
 
-impl Handler<TraceMessage<GetHealth>> for MemoryStore {
-    type Result = Result<Health, APIError>;
-
-    fn handle(&mut self, msg: TraceMessage<GetHealth>, ctx: &mut Self::Context) -> Self::Result {
-        let _entered = msg.span.enter();
-        self.handle(msg.message, ctx)
-    }
-}
+trace_handler!(MemoryStore, GetHealth, Result<Health, APIError>);
 
 impl Handler<GetHealth> for MemoryStore {
     type Result = Result<Health, APIError>;
