@@ -315,7 +315,7 @@ dependencies = [
  "actix-web",
  "futures",
  "pin-project",
- "prometheus 0.10.0",
+ "prometheus",
 ]
 
 [[package]]
@@ -554,9 +554,9 @@ dependencies = [
  "lazy_static",
  "log",
  "mime",
- "opentelemetry",
+ "opentelemetry 0.9.0",
  "opentelemetry-jaeger",
- "prometheus 0.10.0",
+ "prometheus",
  "rand 0.7.3",
  "sentry",
  "serde",
@@ -1606,8 +1606,22 @@ dependencies = [
  "lazy_static",
  "percent-encoding",
  "pin-project",
- "prometheus 0.7.0",
  "rand 0.7.3",
+]
+
+[[package]]
+name = "opentelemetry"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "afef0a01b0581b78e373e696abc441148c0500badb8083fb50dd0eb07742e87f"
+dependencies = [
+ "async-trait",
+ "futures",
+ "lazy_static",
+ "percent-encoding",
+ "pin-project",
+ "rand 0.7.3",
+ "regex",
 ]
 
 [[package]]
@@ -1616,7 +1630,7 @@ version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "02a885963fd184822847d08527f3d53164a9fb6f770ceae61ea9388dc208690b"
 dependencies = [
- "opentelemetry",
+ "opentelemetry 0.8.0",
  "thrift",
  "ureq",
 ]
@@ -1725,20 +1739,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36e28516df94f3dd551a587da5357459d9b36d945a7c37c3557928c1c2ff2a2c"
 dependencies = [
  "unicode-xid",
-]
-
-[[package]]
-name = "prometheus"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5567486d5778e2c6455b1b90ff1c558f29e751fc018130fa182e15828e728af1"
-dependencies = [
- "cfg-if",
- "fnv",
- "lazy_static",
- "protobuf",
- "quick-error",
- "spin",
 ]
 
 [[package]]
@@ -2772,7 +2772,7 @@ version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c776834eab0d599523cc58accac54f32e1f8d2cea1dbcae157f28e279de7004"
 dependencies = [
- "opentelemetry",
+ "opentelemetry 0.8.0",
  "rand 0.7.3",
  "tracing",
  "tracing-core",
