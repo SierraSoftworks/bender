@@ -24,7 +24,7 @@ http = "0.2"
 lazy_static = "1.4"
 log = "0.4"
 mime = "0.3"
-opentelemetry = "0.8"
+opentelemetry = "0.10"
 opentelemetry-jaeger = { version = "0.7.0", features = ["collector_client"] }
 prometheus = "0.10"
 rand = "0.8"
