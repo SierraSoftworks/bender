@@ -42,11 +42,10 @@ jobs:
       - uses: Swatinem/rust-cache@v1
 
       - name: Build Handler
-        uses: heroku/rust-cargo-musl-action@v1
-        with:
-          command: 'build'
+        run:
+          docker run --rm -t -v $PWD:/volume clux/muslrust cargo build --release
 
-      - run: cp target/release/$HANDLER_NAME ./
+      - run: cp target/x86_64-unknown-linux-musl/release/$HANDLER_NAME ./handler
 
       - name: Save handler artifact
         uses: actions/upload-artifact@v2
@@ -65,6 +64,8 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: handler
+
+      - run: mv ./handler ./$HANDLER_NAME
       
       - name: 'Login via Azure CLI'
         uses: azure/login@v1
