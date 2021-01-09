@@ -33,10 +33,15 @@ jobs:
   build:
     needs: test
     if: github.event_name == 'push'
-    
+
     runs-on: ubuntu-20.04
 
     steps:
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install musl-tools
+
       - uses: actions/checkout@v2
 
       - name: Get Rust Stable
