@@ -65,7 +65,10 @@ fn init_opentelemetry() {
                 .init();
         }
     };
+}
 
+fn get_listening_port() -> u16 {
+    std::env::var("FUNCTIONS_CUSTOMHANDLER_PORT").map(|v| v.parse().unwrap_or(8000)).unwrap_or(8000)
 }
 
 #[actix_rt::main]
@@ -89,7 +92,9 @@ async fn main() -> std::io::Result<()> {
         path: std::path::PathBuf::from("./quotes.json"),
     }, &state).await?;
 
-    println!("Starting server on :8000");
+    let listen_on = get_listening_port();
+
+    println!("Starting server on :{}", listen_on);
     HttpServer::new(move || {
         App::new()
             .data(state.clone())
@@ -101,7 +106,7 @@ async fn main() -> std::io::Result<()> {
                 .finish())
             .configure(api::configure)
     })
-    .bind("0.0.0.0:8000")?
+    .bind(format!("0.0.0.0:{}", listen_on))?
     .run()
     .await
 }
