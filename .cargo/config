@@ -1,2 +1,5 @@
 [target.x86_64-unknown-linux-musl]
 linker = "rust-lld"
+
+[target.x86_64-unknown-linux-musl.features]
+vendored-openssl = "openssl-sys/vendored"
