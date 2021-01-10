@@ -15,7 +15,11 @@ use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetrics;
 use prometheus::default_registry;
+use telemetry::Session;
+use tracing::{Instrument, event, info_span};
 use tracing_actix_web::TracingLogger;
+use opentelemetry::{sdk::export::trace::stdout, trace::Tracer as _};
+use tracing_subscriber::{Registry, prelude::__tracing_subscriber_SubscriberExt};
 
 mod api;
 mod models;
@@ -28,23 +32,7 @@ fn get_listening_port() -> u16 {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    let (_tracer, _uninstall) = opentelemetry_application_insights::new_pipeline(
-        std::env::var("APPINSIGHTS_INSTRUMENTATIONKEY").unwrap_or_default()
-    )
-        .with_client(reqwest::Client::new())
-        .with_endpoint("https://northeurope-0.in.applicationinsights.azure.com/").expect("The AppInsights telemetry endpoint should parse correctly")
-        .install();
-
-    if match std::env::var("APPINSIGHTS_INSTRUMENTATIONKEY") {
-        Ok(key) if key.is_empty() => true,
-        Err(_) => true,
-        _ => false
-    } {
-        tracing_subscriber::fmt()
-            .with_max_level(tracing::Level::INFO)
-            .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE)
-            .init();
-    }
+    let _session = Session::new();
 
     let _raven = sentry::init((
         "https://950ba56ab61a4abcb3679b1117158c33@o219072.ingest.sentry.io/1362607",
@@ -57,9 +45,10 @@ async fn main() -> std::io::Result<()> {
     let state = api::GlobalState::new();
     let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();
 
+    info!("Preparing service to start");
     store::load_global_state(&store::file::FileLoader {
         path: std::path::PathBuf::from("./quotes.json"),
-    }, &state).await?;
+    }, &state).instrument(info_span!("Loading global state information")).await?;
 
     let listen_on = get_listening_port();
 
