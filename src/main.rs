@@ -14,58 +14,14 @@ extern crate rand;
 use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetrics;
-use opentelemetry::api::Key;
 use prometheus::default_registry;
 use tracing_log::LogTracer;
 use tracing_actix_web::TracingLogger;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::Registry;
-use crate::telemetry::OpenTelemetryB3;
 
 mod api;
 mod models;
 mod store;
 mod telemetry;
-
-fn init_opentelemetry() {
-    match std::env::var("JAEGER_COLLECTOR_ENDPOINT") {
-        Ok(endpoint) if !endpoint.is_empty() => {
-            let exporter = opentelemetry_jaeger::Exporter::builder()
-                .with_collector_endpoint(endpoint)
-                .with_process(opentelemetry_jaeger::Process {
-                    service_name: "bender".to_string(),
-                    tags: vec![
-                        Key::new("service.version").string((release_name!()).unwrap_or("dev".into()))
-                    ]
-                })
-                .init()
-                .unwrap();
-            
-            let provider = opentelemetry::sdk::Provider::builder()
-                .with_simple_exporter(exporter)
-                .with_config(opentelemetry::sdk::Config {
-                    default_sampler: Box::new(opentelemetry::sdk::Sampler::AlwaysOn),
-                    ..Default::default()
-                })
-                .build();
-
-            opentelemetry::global::set_provider(provider);
-                    
-            let tracer = opentelemetry::global::tracer("bender");
-            let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
-            let subscriber = Registry::default()
-                .with(telemetry);
-            tracing::subscriber::set_global_default(subscriber).unwrap_or_default();
-        },
-        _ => {
-            opentelemetry::global::set_provider(opentelemetry::api::NoopProvider{});
-            tracing_subscriber::fmt()
-                .with_max_level(tracing::Level::INFO)
-                .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE)
-                .init();
-        }
-    };
-}
 
 fn get_listening_port() -> u16 {
     std::env::var("FUNCTIONS_CUSTOMHANDLER_PORT").map(|v| v.parse().unwrap_or(8000)).unwrap_or(8000)
@@ -73,7 +29,13 @@ fn get_listening_port() -> u16 {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    init_opentelemetry();
+    let (_tracer, _uninstall) = opentelemetry_application_insights::new_pipeline(
+        std::env::var("APPINSIGHTS_INSTRUMENTATIONKEY").unwrap_or_default()
+    )
+        .with_client(reqwest::Client::new())
+        .install();
+
+
     LogTracer::init().unwrap_or_default();
 
     let _raven = sentry::init((
@@ -84,7 +46,6 @@ async fn main() -> std::io::Result<()> {
         },
     ));
 
-
     let state = api::GlobalState::new();
     let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();
 
@@ -94,13 +55,12 @@ async fn main() -> std::io::Result<()> {
 
     let listen_on = get_listening_port();
 
-    println!("Starting server on :{}", listen_on);
+    info!("Starting server on :{}", listen_on);
     HttpServer::new(move || {
         App::new()
             .data(state.clone())
             .wrap(metrics.clone())
             .wrap(TracingLogger)
-            .wrap(OpenTelemetryB3)
             .wrap(Cors::new()
                 .send_wildcard()
                 .finish())
