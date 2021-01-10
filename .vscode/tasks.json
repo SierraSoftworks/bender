@@ -31,6 +31,12 @@
                 "${workspaceFolder}/Bender/Bender.csproj"
             ],
             "problemMatcher": "$tsc"
+        },
+        {
+            "type": "func",
+            "command": "host start",
+            "problemMatcher": "$func-watch",
+            "isBackground": true
         }
     ]
 }
