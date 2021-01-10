@@ -15,7 +15,6 @@ use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use actix_web_prom::PrometheusMetrics;
 use prometheus::default_registry;
-use tracing_log::LogTracer;
 use tracing_actix_web::TracingLogger;
 
 mod api;
@@ -33,10 +32,19 @@ async fn main() -> std::io::Result<()> {
         std::env::var("APPINSIGHTS_INSTRUMENTATIONKEY").unwrap_or_default()
     )
         .with_client(reqwest::Client::new())
+        .with_endpoint("https://northeurope-0.in.applicationinsights.azure.com/").expect("The AppInsights telemetry endpoint should parse correctly")
         .install();
 
-
-    LogTracer::init().unwrap_or_default();
+    if match std::env::var("APPINSIGHTS_INSTRUMENTATIONKEY") {
+        Ok(key) if key.is_empty() => true,
+        Err(_) => true,
+        _ => false
+    } {
+        tracing_subscriber::fmt()
+            .with_max_level(tracing::Level::INFO)
+            .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE)
+            .init();
+    }
 
     let _raven = sentry::init((
         "https://950ba56ab61a4abcb3679b1117158c33@o219072.ingest.sentry.io/1362607",
