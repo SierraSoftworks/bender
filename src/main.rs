@@ -8,13 +8,9 @@ extern crate tokio;
 extern crate rand;
 #[macro_use] extern crate tracing;
 #[macro_use] extern crate sentry;
-#[macro_use] extern crate lazy_static;
-#[macro_use] extern crate prometheus;
 
 use actix_cors::Cors;
 use actix_web::{App, HttpServer};
-use actix_web_prom::PrometheusMetrics;
-use prometheus::default_registry;
 use telemetry::Session;
 use tracing::{Instrument, info_span};
 
@@ -40,7 +36,6 @@ async fn main() -> std::io::Result<()> {
     ));
 
     let state = api::GlobalState::new();
-    let metrics = PrometheusMetrics::new_with_registry(default_registry().clone(), "bender", Some("/api/v1/metrics"), None).unwrap();
 
     info!("Preparing service to start");
     store::load_global_state(&store::file::FileLoader {
@@ -55,11 +50,9 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .data(state.clone())
-            .wrap(metrics.clone())
             .wrap(telemetry::TracingLogger)
-            .wrap(Cors::new()
-                .send_wildcard()
-                .finish())
+            .wrap(Cors::default()
+                .send_wildcard())
             .configure(api::configure)
     })
     .bind(format!("0.0.0.0:{}", listen_on))?

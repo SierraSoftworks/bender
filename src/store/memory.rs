@@ -5,26 +5,6 @@ use actix::prelude::*;
 use tracing::*;
 use crate::api::APIError;
 use rand::seq::{SliceRandom, IteratorRandom};
-use prometheus::{self, IntGauge, IntCounterVec};
-
-lazy_static! {
-    static ref QUOTES_LOADED_COUNTER: IntCounterVec =
-        register_int_counter_vec!(
-            "bender_quotes_loaded_total",
-            "The number of quotes which have been loaded into the Bender instance by each author..",
-            &["author"]
-        ).unwrap();
-
-    static ref QUOTES_VIEWED_COUNTER: IntCounterVec =
-        register_int_counter_vec!(
-            "bender_quotes_viewed_total",
-            "The number of times that quotes by each author have been viewed.",
-            &["author"]
-        ).unwrap();
-
-    static ref UP_GAUGE: IntGauge =
-        register_int_gauge!("process_start_time_seconds", "The time at which the application was first started.").unwrap();
-}
 
 pub struct MemoryStore {
     quotes: Arc<RwLock<Vec<Quote>>>,
@@ -33,8 +13,6 @@ pub struct MemoryStore {
 
 impl MemoryStore {
     pub fn new() -> Self {
-        UP_GAUGE.set(chrono::Utc::now().timestamp());
-
         Self {
             quotes: Arc::new(RwLock::new(Vec::new())),
             started_at: chrono::Utc::now(),
@@ -53,8 +31,6 @@ impl Handler<AddQuote> for MemoryStore {
 
     #[instrument(err, skip(self), name="add_quote", fields(otel.kind = "internal"))]
     fn handle(&mut self, msg: AddQuote, _: &mut Self::Context) -> Self::Result {
-        QUOTES_LOADED_COUNTER.with_label_values(&[msg.who.as_str()]).inc();
-
         let mut qs = info_span!("lock.acquire", "otel.kind" = "internal", db.instance="quotes", db.statement="WRITE").in_scope(|| {
             self.quotes.write().map_err(|exception| {
                 error!("Unable to acquire write lock on quotes collection: {:?}", exception);
@@ -86,7 +62,6 @@ impl Handler<AddQuotes> for MemoryStore {
         })?;
 
         for quote in msg.quotes {
-            QUOTES_LOADED_COUNTER.with_label_values(&[quote.who.as_str()]).inc();
             qs.push(quote);
         }
 
@@ -122,7 +97,6 @@ impl Handler<GetQuote> for MemoryStore {
                 APIError::new(404, "Not Found", "There are no quotes available right now, please add one and try again.")
             })
             .map(|q| {
-                QUOTES_VIEWED_COUNTER.with_label_values(&[q.who.as_str()]).inc();
                 q.clone()
             })
     }

@@ -3,17 +3,6 @@ use crate::models::Quote;
 use actix_web::{Error, HttpRequest, HttpResponse, Responder, http::header, http::header::Header};
 use futures::future::{ready, Ready};
 
-use prometheus::{self, IntCounterVec};
-
-lazy_static! {
-    static ref RESPONSE_FORMATS_COUNTER: IntCounterVec =
-        register_int_counter_vec!(
-            "bender_response_formats_total",
-            "The number of times that a specific mime type output format has been served.",
-            &["format"]
-        ).unwrap();
-}
-
 #[derive(Serialize, Deserialize)]
 pub struct QuoteV1 {
     pub quote: String,
@@ -57,7 +46,7 @@ impl Responder for QuoteV1 {
             "application/json"
         }).unwrap_or("application/json");
 
-        RESPONSE_FORMATS_COUNTER.with_label_values(&[content_type]).inc();
+        info!({ http.content_type = %content_type}, "Rendering quote");
 
         ready(Ok(match content_type {
             "text/plain" => HttpResponse::Ok()

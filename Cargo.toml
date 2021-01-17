@@ -8,11 +8,10 @@ edition = "2018"
 
 [dependencies]
 actix = "0.10"
-actix-cors = "0.4"
+actix-cors = "0.5"
 actix-rt = "1.0"
 actix-service = "1.0"
 actix-web = "3.3"
-actix-web-prom = "0.5"
 async-trait = "0.1.42"
 azure_sdk_core = "0.43.7"
 azure_sdk_storage_blob = "0.45.3"
@@ -21,12 +20,10 @@ chrono = { version = "0.4", features = ["serde"] }
 env_logger = "0.8"
 futures = "0.3"
 http = "0.2"
-lazy_static = "1.4"
 log = "0.4"
 mime = "0.3"
 opentelemetry = { version = "0.11", features = ["tokio"] }
 opentelemetry-application-insights = { version = "0.10", features = ["reqwest-client"] }
-prometheus = "0.10"
 rand = "0.8"
 reqwest = { version = "0.10" }
 sentry = "0.22"

@@ -68,14 +68,16 @@ dependencies = [
 
 [[package]]
 name = "actix-cors"
-version = "0.4.1"
+version = "0.5.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f3e5c769e4d332bfad27f11b8139b5818c4bbddb02c385b8f16344d93ff1a8eb"
+checksum = "36b133d8026a9f209a9aeeeacd028e7451bcca975f592881b305d37983f303d7"
 dependencies = [
- "actix-service",
  "actix-web",
  "derive_more",
  "futures-util",
+ "log",
+ "once_cell",
+ "tinyvec 1.0.1",
 ]
 
 [[package]]
@@ -302,20 +304,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "actix-web-prom"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06c15667d3609eb3edaf95eae2fe58604d24e16c7756d900e73a5ad04045b9c5"
-dependencies = [
- "actix-http",
- "actix-service",
- "actix-web",
- "futures",
- "pin-project 0.4.23",
- "prometheus",
 ]
 
 [[package]]
@@ -549,7 +537,6 @@ dependencies = [
  "actix-rt",
  "actix-service",
  "actix-web",
- "actix-web-prom",
  "async-trait",
  "azure_sdk_core",
  "azure_sdk_storage_blob",
@@ -558,12 +545,10 @@ dependencies = [
  "env_logger 0.8.2",
  "futures",
  "http",
- "lazy_static",
  "log",
  "mime",
  "opentelemetry",
  "opentelemetry-application-insights",
- "prometheus",
  "rand 0.8.2",
  "reqwest 0.10.8",
  "sentry",
@@ -1910,27 +1895,6 @@ checksum = "1e0704ee1a7e00d7bb417d0770ea303c1bccbabf0ef1667dae92b5967f5f8a71"
 dependencies = [
  "unicode-xid",
 ]
-
-[[package]]
-name = "prometheus"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30d70cf4412832bcac9cffe27906f4a66e450d323525e977168c70d1b36120ae"
-dependencies = [
- "cfg-if 0.1.10",
- "fnv",
- "lazy_static",
- "parking_lot",
- "protobuf",
- "regex",
- "thiserror",
-]
-
-[[package]]
-name = "protobuf"
-version = "2.17.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb14183cc7f213ee2410067e1ceeadba2a7478a59432ff0747a335202798b1e2"
 
 [[package]]
 name = "quick-error"
