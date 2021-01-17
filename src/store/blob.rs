@@ -1,8 +1,8 @@
 use actix::prelude::*;
-use tracing::{Level, event, instrument, span};
+use tracing::*;
 use tracing_futures::Instrument;
-use super::{Loader, StateView, Store};
-use crate::models::*;
+use super::{Loader, Store};
+use crate::{api::APIError, models::*};
 use crate::telemetry::*;
 use std::{path::PathBuf, error::Error};
 
@@ -18,10 +18,14 @@ pub struct BlobLoader {
 
 #[async_trait::async_trait]
 impl Loader for BlobLoader {
-    #[instrument(err, skip(self, state))]
-    async fn load_quotes(&self, state: Addr<Store>) -> Result<(), Box<dyn Error>> {
+    #[instrument(err, skip(self, state), fields(otel.kind = "internal"))]
+    async fn load_quotes(&self, state: Addr<Store>) -> Result<(), APIError> {
         debug!("Initializing Azure Blob storage client");
-        let blob_client = client::from_connection_string(self.connection_string.as_str())?;
+        let blob_client = client::from_connection_string(self.connection_string.as_str())
+            .map_err(|err| {
+                error!({ exception.message = %err }, "Unable to create Azure Blob Storage client");
+                APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
+            })?;
 
         debug!("Fetching {}", self.path.display());
         let blob = blob_client
@@ -29,48 +33,54 @@ impl Loader for BlobLoader {
                     .with_container_name(self.container.as_str())
                     .with_blob_name(self.path.to_string_lossy().to_string().as_str())
                     .finalize()
-                    .instrument(span!(Level::INFO, "get_blob", db.instance = self.container.as_str(), db.statement = format!("GET {}", self.path.display()).as_str()))
-                    .await?;
+                    .instrument(info_span!("get_blob", "otel.kind" = "client", db.system = "azure_storage", db.instance = self.container.as_str(), db.statement = format!("GET {}", self.path.display()).as_str()))
+                    .await
+                    .map_err(|err| {
+                        error!({ exception.message = %err }, "Failed to fetch quote file from Azure Blob Storage.");
+                        APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
+                    })?;
 
-        let fc: Vec<BlobQuoteV1> = span!(Level::DEBUG, "deserialize").in_scope(|| serde_json::from_slice(&blob.data) )?;
+        let fc: Vec<BlobQuoteV1> = debug_span!("deserialize").in_scope(|| serde_json::from_slice(&blob.data) )
+            .map_err(|err| {
+                error!({ exception.message = %err }, "Unable to parse quote file.");
+                APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
+            })?;
+
         let quote_count = fc.len();
         info!("Received {} quotes from Azure blob storage", quote_count);
 
-        for q in fc {
-            match state.send(AddQuote{
-                quote: q.quote,
-                who: q.who,
-            }.trace())
-            .await? {
-                Ok(_) => {},
-                Err(err) => {
-                    error!("Failed to load quotes from {}: {}", self.path.display(), err);
-                    Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, format!("{}", err))))?;
-                },
-            }
+        match state.send(AddQuotes {
+            quotes: fc.iter().map(|q| q.clone().into()).collect()
+        }.trace()).await? {
+            Ok(_) => {
+                event!(Level::INFO, "Loaded {} quotes into the state store.", quote_count);
+                Ok(())
+            },
+            Err(err) => {
+                error!("Failed to load quotes from {}: {}", self.path.display(), err);
+                Err(err)
+            },
         }
-
-        event!(Level::INFO, "Loaded {} quotes into the state store.", quote_count);
-
-        Ok(())
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct BlobQuoteV1 {
     pub quote: String,
     pub who: String,
 }
 
-impl StateView<Quote> for BlobQuoteV1 {
-    fn to_state(&self) -> Quote {
+impl Into<Quote> for BlobQuoteV1 {
+    fn into(self) -> Quote {
         Quote {
             quote: self.quote.clone(),
             who: self.who.clone(),
         }
     }
+}
 
-    fn from_state(state: &Quote) -> Self {
+impl From<Quote> for BlobQuoteV1 {
+    fn from(state: Quote) -> Self {
         Self {
             quote: state.quote.clone(),
             who: state.who.clone(),

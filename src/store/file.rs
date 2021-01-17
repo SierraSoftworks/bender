@@ -1,9 +1,9 @@
 use actix::prelude::*;
-use tracing::{Level, event, info_span, instrument};
-use super::{Loader, StateView, Store};
-use crate::models::*;
+use tracing::*;
+use super::{Loader, Store};
+use crate::{api::APIError, models::*};
 use crate::telemetry::*;
-use std::{fs::File, path::PathBuf, error::Error};
+use std::{fs::File, path::PathBuf};
 
 pub struct FileLoader {
     pub path: PathBuf,
@@ -11,53 +11,57 @@ pub struct FileLoader {
 
 #[async_trait::async_trait]
 impl Loader for FileLoader {
-    #[instrument(err, skip(self, state))]
-    async fn load_quotes(&self, state: Addr<Store>) -> Result<(), Box<dyn Error>> {
+    #[instrument(err, skip(self, state), fields(otel.kind = "internal"))]
+    async fn load_quotes(&self, state: Addr<Store>) -> Result<(), APIError> {
         info!("Loading quotes from {}", self.path.display());
 
         debug!("Opening file");
-        let f = File::open(self.path.clone())?;
+        let f = File::open(self.path.clone())
+                .map_err(|err| {
+                    error!({ exception.message = ?err }, "Unable to open quotes file.");
+                    APIError::new(503, "Service Unavailable", "We could not load the quotes needed to give you your daily dose of fun, we're so sorry.")
+                })?;
 
         
-        let fc: Vec<FileQuoteV1> = info_span!("read_file").in_scope(|| serde_json::from_reader(f) )?;
+        let fc: Vec<FileQuoteV1> = info_span!("read_file").in_scope(|| serde_json::from_reader(f) ).map_err(|err| {
+            error!({ exception.message = ?err }, "Unable to parse quotes file.");
+            APIError::new(503, "Service Unavailable", "We could not load the quotes needed to give you your daily dose of fun, we're so sorry.")
+        })?;
         let quote_count = fc.len();
         info!("Read {} quotes from file", quote_count);
 
-        for q in fc {
-            match state.send(AddQuote{
-                quote: q.quote,
-                who: q.who,
-            }.trace())
-            .await? {
-                Ok(_) => {},
-                Err(err) => {
-                    error!("Failed to load quotes from {}: {}", self.path.display(), err);
-                    Err(Box::new(std::io::Error::new(std::io::ErrorKind::Other, format!("{}", err))))?;
-                },
-            }
+        match state.send(AddQuotes {
+            quotes: fc.iter().map(|q| q.clone().into()).collect()
+        }.trace()).await? {
+            Ok(_) => {
+                event!(Level::INFO, "Loaded {} quotes into the state store.", quote_count);
+                Ok(())
+            },
+            Err(err) => {
+                error!("Failed to load quotes from {}: {}", self.path.display(), err);
+                Err(err)
+            },
         }
-
-        event!(Level::INFO, "Loaded {} quotes into the state store.", quote_count);
-
-        Ok(())
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct FileQuoteV1 {
     pub quote: String,
     pub who: String,
 }
 
-impl StateView<Quote> for FileQuoteV1 {
-    fn to_state(&self) -> Quote {
+impl Into<Quote> for FileQuoteV1 {
+    fn into(self) -> Quote {
         Quote {
             quote: self.quote.clone(),
             who: self.who.clone(),
         }
     }
+}
 
-    fn from_state(state: &Quote) -> Self {
+impl From<Quote> for FileQuoteV1 {
+    fn from(state: Quote) -> Self {
         Self {
             quote: state.quote.clone(),
             who: state.who.clone(),

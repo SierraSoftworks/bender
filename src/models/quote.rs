@@ -17,6 +17,16 @@ impl Message for AddQuote {
     type Result = Result<(), APIError>;
 }
 
+
+#[derive(Debug)]
+pub struct AddQuotes {
+    pub quotes: Vec<Quote>,
+}
+
+impl Message for AddQuotes {
+    type Result = Result<(), APIError>;
+}
+
 #[derive(Debug)]
 pub struct GetQuote {
     pub who: String,

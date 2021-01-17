@@ -47,3 +47,9 @@ impl From<actix::MailboxError> for APIError {
         Self::new(500, "Internal Server Error", "We ran into a problem, this has been reported and will be looked at.")
     }
 }
+
+impl Into<std::io::Error> for APIError {
+    fn into(self) -> std::io::Error {
+        std::io::ErrorKind::Other.into()
+    }
+}

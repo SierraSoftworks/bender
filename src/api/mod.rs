@@ -3,7 +3,7 @@ pub mod quote;
 pub mod error;
 
 pub use error::APIError;
-pub use crate::models::{GlobalState, StateView};
+pub use crate::models::{GlobalState};
 
 use actix_web::web;
 

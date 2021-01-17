@@ -2,7 +2,7 @@ use std::sync::{RwLock, Arc};
 use crate::{models::*, trace_handler};
 use crate::telemetry::*;
 use actix::prelude::*;
-use tracing::{info_span, instrument};
+use tracing::*;
 use crate::api::APIError;
 use rand::seq::{SliceRandom, IteratorRandom};
 use prometheus::{self, IntGauge, IntCounterVec};
@@ -51,11 +51,11 @@ trace_handler!(MemoryStore, AddQuote, Result<(), APIError>);
 impl Handler<AddQuote> for MemoryStore {
     type Result = Result<(), APIError>;
 
-    #[instrument(err, skip(self), name="add_quote")]
+    #[instrument(err, skip(self), name="add_quote", fields(otel.kind = "internal"))]
     fn handle(&mut self, msg: AddQuote, _: &mut Self::Context) -> Self::Result {
         QUOTES_LOADED_COUNTER.with_label_values(&[msg.who.as_str()]).inc();
 
-        let mut qs = info_span!("lock.acquire", db.instance="quotes", db.statement="WRITE").in_scope(|| {
+        let mut qs = info_span!("lock.acquire", "otel.kind" = "internal", db.instance="quotes", db.statement="WRITE").in_scope(|| {
             self.quotes.write().map_err(|exception| {
                 error!("Unable to acquire write lock on quotes collection: {:?}", exception);
                 APIError::new(500, "Internal Server Error", "The service is currently unavailable, please try again later.")
@@ -71,15 +71,38 @@ impl Handler<AddQuote> for MemoryStore {
     }
 }
 
+trace_handler!(MemoryStore, AddQuotes, Result<(), APIError>);
+
+impl Handler<AddQuotes> for MemoryStore {
+    type Result = Result<(), APIError>;
+
+    #[instrument(err, skip(self), name="add_quotes", fields(otel.kind = "internal"))]
+    fn handle(&mut self, msg: AddQuotes, _: &mut Self::Context) -> Self::Result {
+        let mut qs = info_span!("lock.acquire", "otel.kind" = "internal", db.instance="quotes", db.statement="WRITE").in_scope(|| {
+            self.quotes.write().map_err(|exception| {
+                error!("Unable to acquire write lock on quotes collection: {:?}", exception);
+                APIError::new(500, "Internal Server Error", "The service is currently unavailable, please try again later.")
+            })
+        })?;
+
+        for quote in msg.quotes {
+            QUOTES_LOADED_COUNTER.with_label_values(&[quote.who.as_str()]).inc();
+            qs.push(quote);
+        }
+
+        Ok(())
+    }
+}
+
 trace_handler!(MemoryStore, GetQuote, Result<Quote, APIError>);
 
 impl Handler<GetQuote> for MemoryStore {
     type Result = Result<Quote, APIError>;
 
-    #[instrument(err, skip(self), name="get_quote")]
+    #[instrument(err, skip(self), name="get_quote", fields(otel.kind = "internal"))]
     fn handle(&mut self, msg: GetQuote, _: &mut Self::Context) -> Self::Result {
 
-        let qs = info_span!("lock.acquire", db.instance="quotes", db.statement="WRITE").in_scope(|| {
+        let qs = info_span!("lock.acquire", "otel.kind" = "internal", db.instance="quotes", db.statement="WRITE").in_scope(|| {
             self.quotes.read().map_err(|exception| {
                 error!("Unable to acquire read lock on quotes collection: {:?}", exception);
                 APIError::new(500, "Internal Server Error", "The service is currently unavailable, please try again later.")
@@ -110,7 +133,7 @@ trace_handler!(MemoryStore, GetHealth, Result<Health, APIError>);
 impl Handler<GetHealth> for MemoryStore {
     type Result = Result<Health, APIError>;
 
-    #[instrument(err, skip(self), name="get_health")]
+    #[instrument(err, skip(self), name="get_health", fields(otel.kind = "internal"))]
     fn handle(&mut self, _: GetHealth, _: &mut Self::Context) -> Self::Result {
         Ok(Health {
             ok: true,

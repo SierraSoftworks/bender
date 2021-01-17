@@ -1,4 +1,3 @@
-use super::super::StateView;
 use crate::models::Quote;
 
 use actix_web::{Error, HttpRequest, HttpResponse, Responder, http::header, http::header::Header};
@@ -21,15 +20,17 @@ pub struct QuoteV1 {
     pub who: String,
 }
 
-impl StateView<Quote> for QuoteV1 {
-    fn to_state(&self) -> Quote {
+impl Into<Quote> for QuoteV1 {
+    fn into(self) -> Quote {
         Quote {
             quote: self.quote.clone(),
             who: self.who.clone(),
         }
     }
+}
 
-    fn from_state(state: &Quote) -> Self {
+impl From<Quote> for QuoteV1 {
+    fn from(state: Quote) -> Self {
         Self {
             quote: state.quote.clone(),
             who: state.who.clone(),

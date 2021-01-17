@@ -1,12 +1,10 @@
-use opentelemetry::sdk::trace::Tracer;
 use opentelemetry_application_insights::Uninstall;
 use tracing::dispatcher::DefaultGuard;
 use tracing_subscriber::{Registry, prelude::__tracing_subscriber_SubscriberExt};
 
 pub struct Session {
-    guard: Option<DefaultGuard>,
-
-    uninstall: Option<Uninstall>,
+    _guard: Option<DefaultGuard>,
+    _uninstall: Option<Uninstall>,
 }
 
 impl Session {
@@ -20,8 +18,8 @@ impl Session {
                 .init();
 
             Self {
-                guard: None,
-                uninstall: None
+                _guard: None,
+                _uninstall: None
             }
         } else {
             let (tracer, uninstall) = opentelemetry_application_insights::new_pipeline(
@@ -39,8 +37,8 @@ impl Session {
             let guard = tracing::subscriber::set_default(subscriber);
     
             Self {
-                guard: Some(guard),
-                uninstall: Some(uninstall),
+                _guard: Some(guard),
+                _uninstall: Some(uninstall),
             }
         }
     }
