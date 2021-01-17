@@ -4,7 +4,7 @@ use tracing_futures::Instrument;
 use super::{Loader, Store};
 use crate::{api::APIError, models::*};
 use crate::telemetry::*;
-use std::{path::PathBuf, error::Error};
+use std::path::PathBuf;
 
 use azure_sdk_core::prelude::*;
 use azure_sdk_storage_blob::prelude::*;
