@@ -52,6 +52,7 @@ async fn main() -> std::io::Result<()> {
             .data(state.clone())
             .wrap(telemetry::TracingLogger)
             .wrap(Cors::default()
+                .allow_any_origin()
                 .send_wildcard())
             .configure(api::configure)
     })
