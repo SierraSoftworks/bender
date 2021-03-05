@@ -9,7 +9,6 @@ extern crate rand;
 #[macro_use] extern crate tracing;
 #[macro_use] extern crate sentry;
 
-use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use telemetry::Session;
 use tracing::{Instrument, info_span};
@@ -51,9 +50,6 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(state.clone())
             .wrap(telemetry::TracingLogger)
-            .wrap(Cors::default()
-                .allow_any_origin()
-                .send_wildcard())
             .configure(api::configure)
     })
     .bind(format!("0.0.0.0:{}", listen_on))?

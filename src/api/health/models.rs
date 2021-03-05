@@ -1,7 +1,4 @@
-use crate::models::*;
-
-use actix_web::{Error, HttpRequest, HttpResponse, Responder};
-use futures::future::{ready, Ready};
+use crate::{json_responder, models::*};
 
 #[derive(Serialize, Deserialize)]
 pub struct HealthV1 {
@@ -23,16 +20,7 @@ impl Into<Health> for HealthV1 {
     }
 }
 
-impl Responder for HealthV1 {
-    type Error = Error;
-    type Future = Ready<Result<HttpResponse, Error>>;
-
-    fn respond_to(self, _req: &HttpRequest) -> Self::Future {
-        ready(Ok(HttpResponse::Ok()
-            .content_type("application/json")
-            .json(&self)))
-    }
-}
+json_responder!(HealthV1);
 
 #[derive(Serialize, Deserialize)]
 pub struct HealthV2 {
@@ -58,13 +46,4 @@ impl From<Health> for HealthV2 {
     }
 }
 
-impl Responder for HealthV2 {
-    type Error = Error;
-    type Future = Ready<Result<HttpResponse, Error>>;
-
-    fn respond_to(self, _req: &HttpRequest) -> Self::Future {
-        ready(Ok(HttpResponse::Ok()
-            .content_type("application/json")
-            .json(&self)))
-    }
-}
+json_responder!(HealthV2);

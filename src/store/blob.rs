@@ -1,14 +1,13 @@
 use actix::prelude::*;
+use azure_core::HttpClient;
 use tracing::*;
 use tracing_futures::Instrument;
 use super::{Loader, Store};
 use crate::{api::APIError, models::*};
 use crate::telemetry::*;
-use std::path::PathBuf;
+use std::{path::PathBuf, sync::Arc};
 
-use azure_sdk_core::prelude::*;
-use azure_sdk_storage_blob::prelude::*;
-use azure_sdk_storage_core::prelude::*;
+use azure_storage::core::prelude::*;
 
 pub struct BlobLoader {
     pub connection_string: String,
@@ -21,18 +20,23 @@ impl Loader for BlobLoader {
     #[instrument(err, skip(self, state), fields(otel.kind = "internal"))]
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), APIError> {
         debug!("Initializing Azure Blob storage client");
-        let blob_client = client::from_connection_string(self.connection_string.as_str())
+        let http_client: Arc<Box<dyn HttpClient>> = Arc::new(Box::new(reqwest::Client::new()));
+
+        let storage_client = StorageAccountClient::new_connection_string(http_client.clone(), self.connection_string.as_str())
             .map_err(|err| {
                 error!({ exception.message = %err }, "Unable to create Azure Blob Storage client");
                 APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
             })?;
 
+        let blob_client = storage_client
+            .as_storage_client()
+            .as_container_client(&self.container)
+            .as_blob_client(&self.path.to_string_lossy().to_string());
+
         debug!("Fetching {}", self.path.display());
         let blob = blob_client
-                    .get_blob()
-                    .with_container_name(self.container.as_str())
-                    .with_blob_name(self.path.to_string_lossy().to_string().as_str())
-                    .finalize()
+                    .get()
+                    .execute()
                     .instrument(info_span!("get_blob", "otel.kind" = "client", db.system = "azure_storage", db.instance = self.container.as_str(), db.statement = format!("GET {}", self.path.display()).as_str()))
                     .await
                     .map_err(|err| {

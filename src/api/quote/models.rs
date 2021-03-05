@@ -1,7 +1,6 @@
 use crate::models::Quote;
 
-use actix_web::{Error, HttpRequest, HttpResponse, Responder, http::header, http::header::Header};
-use futures::future::{ready, Ready};
+use actix_web::{HttpRequest, HttpResponse, Responder, http::header, http::header::Header};
 
 #[derive(Serialize, Deserialize)]
 pub struct QuoteV1 {
@@ -28,10 +27,7 @@ impl From<Quote> for QuoteV1 {
 }
 
 impl Responder for QuoteV1 {
-    type Error = Error;
-    type Future = Ready<Result<HttpResponse, Error>>;
-
-    fn respond_to(self, req: &HttpRequest) -> Self::Future {
+    fn respond_to(self, req: &HttpRequest) -> HttpResponse {
         let content_type = header::Accept::parse(req).map(|header| {
             for a in header.iter() {
                 if a.item.essence_str() == "application/json" {
@@ -48,7 +44,7 @@ impl Responder for QuoteV1 {
 
         info!({ http.content_type = %content_type}, "Rendering quote");
 
-        ready(Ok(match content_type {
+        match content_type {
             "text/plain" => HttpResponse::Ok()
                 .content_type(content_type)
                 .body(format!("{} – {}", self.quote, self.who)),
@@ -95,7 +91,7 @@ impl Responder for QuoteV1 {
                     .content_type(content_type)
                     .json(&self),
             
-        }))
+        }
     }
 }
 
@@ -111,7 +107,7 @@ mod tests {
             who: "Tester".to_string()
         };
 
-        let request = TestRequest::with_header(header::ACCEPT, "text/plain; charset=utf-8").to_http_request();
+        let request = TestRequest::default().insert_header((header::ACCEPT, "text/plain; charset=utf-8")).to_http_request();
 
         let resp = quote.respond_to(&request).await.unwrap();
         assert_eq!(resp.headers().get("Content-Type").unwrap(), "text/plain");
@@ -124,7 +120,7 @@ mod tests {
             who: "Tester".to_string()
         };
 
-        let request = TestRequest::with_header(header::ACCEPT, "text/html; charset=utf-8").to_http_request();
+        let request = TestRequest::default().insert_header((header::ACCEPT, "text/html; charset=utf-8")).to_http_request();
 
         let resp = quote.respond_to(&request).await.unwrap();
         assert_eq!(resp.headers().get("Content-Type").unwrap(), "text/html");
@@ -137,7 +133,7 @@ mod tests {
             who: "Tester".to_string()
         };
 
-        let request = TestRequest::with_header(header::ACCEPT, "application/json; charset=utf-8").to_http_request();
+        let request = TestRequest::default().insert_header((header::ACCEPT, "application/json; charset=utf-8")).to_http_request();
 
         let resp = quote.respond_to(&request).await.unwrap();
         assert_eq!(resp.headers().get("Content-Type").unwrap(), "application/json");
