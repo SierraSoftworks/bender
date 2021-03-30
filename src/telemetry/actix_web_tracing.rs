@@ -74,7 +74,7 @@ where
         let fut = self.service.call(req);
         Box::pin(
             async move {
-                let outcome = fut.await;
+                let outcome = fut.instrument(tracing::info_span!("request.handler")).await;
                 let status_code = match &outcome {
                     Ok(response) => response.response().status(),
                     Err(error) => error.as_response_error().status_code(),
