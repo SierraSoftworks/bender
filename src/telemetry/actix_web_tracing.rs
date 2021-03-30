@@ -46,6 +46,11 @@ where
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
         let propagator = TraceContextPropagator::new();
+        
+        // Propagate OpenTelemetry parent span context information
+        let context  = propagator.extract(&HeaderMapExtractor { headers: req.headers() });
+
+        Span::current().set_parent(context);
 
 
         let user_agent = req
@@ -53,8 +58,6 @@ where
             .get("User-Agent")
             .map(|h| h.to_str().unwrap_or(""))
             .unwrap_or("");
-
-            
 
         let span = tracing::info_span!(
             "request",
@@ -67,10 +70,6 @@ where
             "http.method" = %req.method(),
             "http.url" = %req.uri(),
         );
-
-        // Propagate OpenTelemetry parent span context information
-        let context  = propagator.extract(&HeaderMapExtractor { headers: req.headers() });
-        span.set_parent(context);
 
         let fut = self.service.call(req);
         Box::pin(
