@@ -8,6 +8,7 @@ use crate::telemetry::*;
 use std::{path::PathBuf, sync::Arc};
 
 use azure_storage::core::prelude::*;
+use azure_storage::blob::prelude::*;
 
 pub struct BlobLoader {
     pub connection_string: String,
