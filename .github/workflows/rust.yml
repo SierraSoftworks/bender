@@ -20,6 +20,12 @@ jobs:
       with:
         toolchain: nightly
         override: true
+        components: llvm-tools-preview
+
+    - name: cargo install grcov
+      uses: SierraSoftworks/setup-grcov@v1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Run tests
       uses: actions-rs/cargo@v1
@@ -27,14 +33,12 @@ jobs:
         command: test
         args: --all-features --no-fail-fast
       env:
-        CARGO_INCREMENTAL: '0'
-        RUSTFLAGS: '-Zprofile -Ccodegen-units=1 -Copt-level=0 -Clink-dead-code -Coverflow-checks=off'
+          RUSTFLAGS: -Zinstrument-coverage
         
-    - name: Collect code coverage
-      id: coverage
-      uses: actions-rs/grcov@v0.1
+    - name: grcov
+      run: grcov . --binary-path target/debug/deps/ -s . -t lcov --ignore-not-existing --ignore '../**' --ignore '/*' --ignore 'C:/' -o ./lcov.info
     
-    - name: Upload code coverage
+    - name: codecov upload
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
