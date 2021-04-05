@@ -50,9 +50,9 @@ dependencies = [
 
 [[package]]
 name = "actix-http"
-version = "3.0.0-beta.4"
+version = "3.0.0-beta.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a01f9e0681608afa887d4269a0857ac4226f09ba5ceda25939e8391c9da610a"
+checksum = "fb9c5d7ceb490d6565156ae1d4d467db17da1759425c65a2e36ac5e182e014e2"
 dependencies = [
  "actix-codec",
  "actix-rt",
@@ -65,7 +65,6 @@ dependencies = [
  "brotli2",
  "bytes",
  "bytestring",
- "cfg-if",
  "cookie",
  "derive_more",
  "encoding_rs",
@@ -77,11 +76,13 @@ dependencies = [
  "httparse",
  "itoa",
  "language-tags",
+ "local-channel",
  "log",
  "mime",
  "once_cell",
  "percent-encoding",
  "pin-project",
+ "pin-project-lite",
  "rand 0.8.3",
  "regex",
  "serde",
@@ -174,24 +175,19 @@ dependencies = [
 
 [[package]]
 name = "actix-utils"
-version = "3.0.0-beta.2"
+version = "3.0.0-beta.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "458795e09a29bc5557604f9ff6f32236fd0ee457d631672e4ec8f6a0103bb292"
+checksum = "c7e96334417549752384b169ca5d52bcea9e5081dbb2d3933599ac8b770f642a"
 dependencies = [
- "actix-codec",
- "actix-rt",
- "actix-service",
- "futures-core",
- "futures-sink",
- "log",
+ "local-waker",
  "pin-project-lite",
 ]
 
 [[package]]
 name = "actix-web"
-version = "4.0.0-beta.4"
+version = "4.0.0-beta.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d95e50c9e32e8456220b5804867de76e97a86ab8c38b51c9edcccc0f0fddca7"
+checksum = "6de19cc341c2e68b1ee126de171e86b610b5bbcecc660d1250ebed73e0257bd6"
 dependencies = [
  "actix-codec",
  "actix-http",
@@ -203,22 +199,23 @@ dependencies = [
  "actix-utils",
  "actix-web-codegen",
  "ahash",
- "awc",
  "bytes",
  "derive_more",
  "either",
  "encoding_rs",
  "futures-core",
  "futures-util",
+ "language-tags",
  "log",
  "mime",
+ "once_cell",
  "pin-project",
  "regex",
  "serde",
  "serde_json",
  "serde_urlencoded",
  "smallvec",
- "socket2 0.3.19",
+ "socket2",
  "time 0.2.26",
  "url",
 ]
@@ -324,35 +321,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 
 [[package]]
-name = "awc"
-version = "3.0.0-beta.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "09aecd8728f6491a62b27454ea4b36fb7e50faf32928b0369b644e402c651f4e"
-dependencies = [
- "actix-codec",
- "actix-http",
- "actix-rt",
- "actix-service",
- "base64 0.13.0",
- "bytes",
- "cfg-if",
- "derive_more",
- "futures-core",
- "itoa",
- "log",
- "mime",
- "percent-encoding",
- "pin-project-lite",
- "rand 0.8.3",
- "serde",
- "serde_json",
- "serde_urlencoded",
-]
-
-[[package]]
 name = "azure_core"
 version = "0.1.0"
-source = "git+https://github.com/azure/azure-sdk-for-rust#d4c5f9ac70b85b3f4dfeaff3d38c941c7836c31f"
+source = "git+https://github.com/azure/azure-sdk-for-rust#25c3eb086404c7ef927e6fa081997dec037741bb"
 dependencies = [
  "RustyXML",
  "async-trait",
@@ -381,7 +352,7 @@ dependencies = [
 [[package]]
 name = "azure_storage"
 version = "0.1.0"
-source = "git+https://github.com/azure/azure-sdk-for-rust#d4c5f9ac70b85b3f4dfeaff3d38c941c7836c31f"
+source = "git+https://github.com/azure/azure-sdk-for-rust#25c3eb086404c7ef927e6fa081997dec037741bb"
 dependencies = [
  "RustyXML",
  "azure_core",
@@ -1041,7 +1012,7 @@ dependencies = [
  "httpdate",
  "itoa",
  "pin-project",
- "socket2 0.4.0",
+ "socket2",
  "tokio",
  "tower-service",
  "tracing",
@@ -1146,6 +1117,24 @@ name = "libc"
 version = "0.2.92"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56d855069fafbb9b344c0f962150cd2c1187975cb1c22c1522c240d8c4986714"
+
+[[package]]
+name = "local-channel"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6246c68cf195087205a0512559c97e15eaf95198bf0e206d662092cdcb03fe9f"
+dependencies = [
+ "futures-core",
+ "futures-sink",
+ "futures-util",
+ "local-waker",
+]
+
+[[package]]
+name = "local-waker"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "84f9a2d3e27ce99ce2c3aad0b09b1a7b916293ea9b2bf624c13fe646fadd8da4"
 
 [[package]]
 name = "lock_api"
@@ -1363,9 +1352,9 @@ dependencies = [
 
 [[package]]
 name = "opentelemetry"
-version = "0.12.0"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "514d24875c140ed269eecc2d1b56d7b71b573716922a763c317fb1b1b4b58f15"
+checksum = "b91cea1dfd50064e52db033179952d18c770cbc5dfefc8eba45d619357ba3914"
 dependencies = [
  "async-trait",
  "futures",
@@ -1376,14 +1365,13 @@ dependencies = [
  "rand 0.8.3",
  "thiserror",
  "tokio",
- "tokio-stream",
 ]
 
 [[package]]
 name = "opentelemetry-application-insights"
-version = "0.12.0"
+version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1632cc9ed75578119e50a5d9dccc418e71b01dc0948b476d5a4196b9fe11b3c2"
+checksum = "ade8b55b7b827e7315187262a822030fb4b1eb75b9a6d8908730317b0b4e9b13"
 dependencies = [
  "async-trait",
  "bytes",
@@ -1400,9 +1388,9 @@ dependencies = [
 
 [[package]]
 name = "opentelemetry-semantic-conventions"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ecb679b997c41108a498e3ce8b933fe2f643a9a722ad8ca33f95edab84df106"
+checksum = "0ee3a8db5ab73cceebcf248ed0cdc992f2ed507dc430dae7f3c8eab7c55c13a3"
 dependencies = [
  "opentelemetry",
 ]
@@ -2163,17 +2151,6 @@ checksum = "fe0f37c9e8f3c5a4a66ad655a93c74daac4ad00c441533bf5c6e7990bb42604e"
 
 [[package]]
 name = "socket2"
-version = "0.3.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "122e570113d28d773067fab24266b66753f6ea915758651696b6e35e49f88d6e"
-dependencies = [
- "cfg-if",
- "libc",
- "winapi",
-]
-
-[[package]]
-name = "socket2"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e3dfc207c526015c632472a77be09cf1b6e46866581aecae5cc38fb4235dea2"
@@ -2425,17 +2402,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tokio-stream"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e177a5d8c3bf36de9ebe6d58537d8879e964332f93fb3339e43f618c81361af0"
-dependencies = [
- "futures-core",
- "pin-project-lite",
- "tokio",
-]
-
-[[package]]
 name = "tokio-util"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2527,9 +2493,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-opentelemetry"
-version = "0.11.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cccdf13c28f1654fe806838f28c5b9cb23ca4c0eae71450daa489f50e523ceb1"
+checksum = "99003208b647dae59dcefc49c98aecaa3512fbc29351685d4b9ef23a9218458e"
 dependencies = [
  "opentelemetry",
  "tracing",
