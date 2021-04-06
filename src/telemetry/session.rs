@@ -46,8 +46,10 @@ impl Session {
             }
         }
     }
+}
 
-    pub fn shutdown(self) {
+impl Drop for Session {
+    fn drop(&mut self) {
         opentelemetry::global::shutdown_tracer_provider();
     }
 }

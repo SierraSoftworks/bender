@@ -24,7 +24,7 @@ fn get_listening_port() -> u16 {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    let session = Session::new();
+    let _session = Session::new();
 
     let _raven = sentry::init((
         "https://950ba56ab61a4abcb3679b1117158c33@o219072.ingest.sentry.io/1362607",
@@ -54,9 +54,5 @@ async fn main() -> std::io::Result<()> {
     })
     .bind(format!("0.0.0.0:{}", listen_on))?
     .run()
-    .await?;
-
-    session.shutdown();
-
-    Ok(())
+    .await
 }
