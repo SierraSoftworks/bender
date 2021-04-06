@@ -20,7 +20,7 @@ futures = "0.3"
 http = "0.2"
 log = "0.4"
 mime = "0.3"
-opentelemetry = { version = "0.13", features = ["tokio"] }
+opentelemetry = { version = "0.13", features = ["tokio", "rt-tokio"] }
 opentelemetry-application-insights = { version = "0.13", features = ["reqwest-client"] }
 rand = "0.8"
 reqwest = { version = "0.11" }

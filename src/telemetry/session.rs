@@ -33,7 +33,7 @@ impl Session {
                     KeyValue::new("service.name", "Bender"),
                     KeyValue::new("service.version", env!("CARGO_PKG_VERSION"))
                 ])))
-                .install_simple();
+                .install_batch(opentelemetry::runtime::Tokio);
         
             let telemetry = tracing_opentelemetry::layer()
                 .with_tracked_inactivity(true)
@@ -45,5 +45,9 @@ impl Session {
             Self {
             }
         }
+    }
+
+    pub fn shutdown(self) {
+        opentelemetry::global::shutdown_tracer_provider();
     }
 }
