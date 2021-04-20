@@ -323,7 +323,7 @@ checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 [[package]]
 name = "azure_core"
 version = "0.1.0"
-source = "git+https://github.com/azure/azure-sdk-for-rust#3ce95cfb34e34b40780bcfdc9dbedf523ccee9b1"
+source = "git+https://github.com/azure/azure-sdk-for-rust#8530b14828869e93f200894c7f79b6be3a3ed5e3"
 dependencies = [
  "RustyXML",
  "async-trait",
@@ -333,8 +333,6 @@ dependencies = [
  "failure",
  "futures",
  "http",
- "hyper",
- "hyper-rustls",
  "log",
  "md5",
  "oauth2",
@@ -352,7 +350,7 @@ dependencies = [
 [[package]]
 name = "azure_storage"
 version = "0.1.0"
-source = "git+https://github.com/azure/azure-sdk-for-rust#3ce95cfb34e34b40780bcfdc9dbedf523ccee9b1"
+source = "git+https://github.com/azure/azure-sdk-for-rust#8530b14828869e93f200894c7f79b6be3a3ed5e3"
 dependencies = [
  "RustyXML",
  "azure_core",
@@ -611,15 +609,6 @@ dependencies = [
  "autocfg 1.0.1",
  "cfg-if",
  "lazy_static",
-]
-
-[[package]]
-name = "ct-logs"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1a816186fa68d9e426e3cb4ae4dff1fcd8e4a2c34b781bf7a822574a0d0aac8"
-dependencies = [
- "sct",
 ]
 
 [[package]]
@@ -1025,12 +1014,10 @@ version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f9f7a97316d44c0af9b0301e65010573a853a9fc97046d7331d7f6bc0fd5a64"
 dependencies = [
- "ct-logs",
  "futures-util",
  "hyper",
  "log",
  "rustls",
- "rustls-native-certs",
  "tokio",
  "tokio-rustls",
  "webpki",
@@ -1283,9 +1270,9 @@ dependencies = [
 
 [[package]]
 name = "oauth2"
-version = "4.0.0-alpha.3"
+version = "4.0.0-beta.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14be0cf9da49c1a5b2909ec626949dc549e0adda4e9e7f26e4908f08a5435227"
+checksum = "d64828351c656346fb1b8cb0622b4170c4bb5a382bf4c19666ce395722d08594"
 dependencies = [
  "base64 0.12.3",
  "chrono",
@@ -1294,6 +1281,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "serde_path_to_error",
  "sha2",
  "thiserror",
  "url",
@@ -1855,18 +1843,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustls-native-certs"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a07b7c1885bd8ed3831c289b7870b13ef46fe0e856d288c30d9cc17d75a2092"
-dependencies = [
- "openssl-probe",
- "rustls",
- "schannel",
- "security-framework",
-]
-
-[[package]]
 name = "ryu"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2073,6 +2049,15 @@ checksum = "799e97dc9fdae36a5c8b8f2cae9ce2ee9fdce2058c57a93e6099d919fd982f79"
 dependencies = [
  "itoa",
  "ryu",
+ "serde",
+]
+
+[[package]]
+name = "serde_path_to_error"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42f6109f0506e20f7e0f910e51a0079acf41da8e0694e6442527c4ddf5a2b158"
+dependencies = [
  "serde",
 ]
 
