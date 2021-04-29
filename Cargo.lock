@@ -2433,14 +2433,18 @@ dependencies = [
 
 [[package]]
 name = "tracing-actix-web"
-version = "0.3.0-beta.3"
+version = "0.4.0-beta.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f61ca5db1113b7b2ad09585d24d1143e940465596ba434ba19d506ee2ab28a1"
+checksum = "d232c700ac99b41f56aac3832f138009b2dc7538cbdc76fdc6b8304a1ee2d2e0"
 dependencies = [
+ "actix-http",
+ "actix-service",
  "actix-web",
  "futures",
+ "opentelemetry",
  "tracing",
  "tracing-futures",
+ "tracing-opentelemetry",
  "uuid 0.8.2",
 ]
 
