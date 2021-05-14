@@ -323,7 +323,7 @@ checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 [[package]]
 name = "azure_core"
 version = "0.1.0"
-source = "git+https://github.com/azure/azure-sdk-for-rust#8d275a30e7cd857e38809c651516fc21e51c5ba0"
+source = "git+https://github.com/azure/azure-sdk-for-rust#eb52988af8257c58a009d2f014ddbfd6b49ff65b"
 dependencies = [
  "RustyXML",
  "async-trait",
@@ -350,7 +350,7 @@ dependencies = [
 [[package]]
 name = "azure_storage"
 version = "0.1.0"
-source = "git+https://github.com/azure/azure-sdk-for-rust#8d275a30e7cd857e38809c651516fc21e51c5ba0"
+source = "git+https://github.com/azure/azure-sdk-for-rust#eb52988af8257c58a009d2f014ddbfd6b49ff65b"
 dependencies = [
  "RustyXML",
  "azure_core",
@@ -1272,9 +1272,9 @@ dependencies = [
 
 [[package]]
 name = "oauth2"
-version = "4.0.0-beta.1"
+version = "4.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d64828351c656346fb1b8cb0622b4170c4bb5a382bf4c19666ce395722d08594"
+checksum = "10ad4d0136960353683efa6160b9c867088b4b8f567b762cd37420a10ce32703"
 dependencies = [
  "base64 0.12.3",
  "chrono",
