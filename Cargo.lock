@@ -323,26 +323,23 @@ checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 [[package]]
 name = "azure_core"
 version = "0.1.0"
-source = "git+https://github.com/azure/azure-sdk-for-rust#eb52988af8257c58a009d2f014ddbfd6b49ff65b"
+source = "git+https://github.com/azure/azure-sdk-for-rust#5bd06be7cb60f52696b0f8a2982ac173c9486c32"
 dependencies = [
- "RustyXML",
  "async-trait",
  "base64 0.13.0",
  "bytes",
  "chrono",
- "failure",
+ "dyn-clone",
  "futures",
  "http",
  "log",
- "md5",
  "oauth2",
- "paste",
- "quick-error",
+ "rand 0.7.3",
  "reqwest",
  "serde",
- "serde-xml-rs",
  "serde_derive",
  "serde_json",
+ "thiserror",
  "url",
  "uuid 0.8.2",
 ]
@@ -350,7 +347,7 @@ dependencies = [
 [[package]]
 name = "azure_storage"
 version = "0.1.0"
-source = "git+https://github.com/azure/azure-sdk-for-rust#eb52988af8257c58a009d2f014ddbfd6b49ff65b"
+source = "git+https://github.com/azure/azure-sdk-for-rust#5bd06be7cb60f52696b0f8a2982ac173c9486c32"
 dependencies = [
  "RustyXML",
  "azure_core",
@@ -362,7 +359,6 @@ dependencies = [
  "log",
  "md5",
  "once_cell",
- "quick-error",
  "ring",
  "serde",
  "serde-xml-rs",
@@ -649,6 +645,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "212d0f5754cb6769937f4501cc0e67f4f4483c8d2c3e1e922ee9edbe4ab4c7c0"
 
 [[package]]
+name = "dyn-clone"
+version = "1.0.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee2626afccd7561a06cf1367e2950c4718ea04565e20fb5029b6c7d8ad09abcf"
+
+[[package]]
 name = "either"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -687,28 +689,6 @@ dependencies = [
  "log",
  "regex",
  "termcolor",
-]
-
-[[package]]
-name = "failure"
-version = "0.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d32e9bd16cc02eae7db7ef620b392808b89f6a5e16bb3497d159c6b92a0f4f86"
-dependencies = [
- "backtrace",
- "failure_derive",
-]
-
-[[package]]
-name = "failure_derive"
-version = "0.1.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa4da3c766cd7a0db8242e326e9e4e081edd567072893ed320008189715366a4"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
- "synstructure",
 ]
 
 [[package]]
@@ -1410,12 +1390,6 @@ dependencies = [
  "smallvec",
  "winapi",
 ]
-
-[[package]]
-name = "paste"
-version = "1.0.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "acbf547ad0c65e31259204bd90935776d1c693cec2f4ff7abb7a1bbbd40dfe58"
 
 [[package]]
 name = "percent-encoding"
@@ -2219,18 +2193,6 @@ checksum = "6498a9efc342871f91cc2d0d694c674368b4ceb40f62b65a7a08c3792935e702"
 dependencies = [
  "proc-macro2",
  "quote",
- "unicode-xid",
-]
-
-[[package]]
-name = "synstructure"
-version = "0.12.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b834f2d66f734cb897113e34aaff2f1ab4719ca946f9a7358dba8f8064148701"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
  "unicode-xid",
 ]
 
