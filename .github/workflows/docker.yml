@@ -19,7 +19,7 @@ jobs:
         run: docker build . --file Dockerfile --tag image
 
       - name: Log into registries
-        if: github.event_name == "push"
+        if: github.event_name == 'push'
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
           echo "${{ secrets.DOCKER_HUB }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
@@ -32,7 +32,7 @@ jobs:
           echo "Version $VERSION"
           
       - name: Push image to GitHub
-        if: github.event_name == "push"
+        if: github.event_name == 'push'
         run: |
           IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/${{ github.event.repository.name }}
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
@@ -42,7 +42,7 @@ jobs:
           docker push $IMAGE_ID:${{ steps.version.outputs.version }}
           
       - name: Push image to Docker Hub
-        if: github.event_name == "push"
+        if: github.event_name == 'push'
         run: |
           IMAGE_ID=${{ env.IMAGE }}
           echo IMAGE_ID=$IMAGE_ID
