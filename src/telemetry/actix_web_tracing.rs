@@ -6,6 +6,7 @@ use actix_web::dev::*;
 use futures::{Future, future::{ok, Ready}};
 use opentelemetry::{propagation::{Extractor, TextMapPropagator}, sdk::propagation::TraceContextPropagator};
 use tracing::{Instrument, Span};
+use tracing_honeycomb::{TraceId, register_dist_tracing_root};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 pub struct TracingLogger;
@@ -46,12 +47,6 @@ where
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
         let propagator = TraceContextPropagator::new();
-        
-        // Propagate OpenTelemetry parent span context information
-        let context  = propagator.extract(&HeaderMapExtractor { headers: req.headers() });
-
-        Span::current().set_parent(context);
-
 
         let user_agent = req
             .headers()
@@ -75,6 +70,8 @@ where
             let _enter = span.enter();
             // Propagate OpenTelemetry parent span context information
             let context  = propagator.extract(&HeaderMapExtractor { headers: req.headers() });
+
+            register_dist_tracing_root(TraceId::new(), None).unwrap();
             
             Span::current().set_parent(context.clone());
         }
