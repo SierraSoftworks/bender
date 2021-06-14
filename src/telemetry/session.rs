@@ -1,4 +1,6 @@
 use opentelemetry::{KeyValue, sdk};
+use tracing::metadata::LevelFilter;
+use tracing_honeycomb::new_honeycomb_telemetry_layer;
 use tracing_subscriber::{Registry, prelude::__tracing_subscriber_SubscriberExt};
 
 pub struct Session {
@@ -6,25 +8,29 @@ pub struct Session {
 
 impl Session {
     pub fn new() -> Self {
+        let honeycomb_key = std::env::var("HONEYCOMB_KEY").unwrap_or_default();
         let app_insights_key = std::env::var("APPINSIGHTS_INSTRUMENTATIONKEY").unwrap_or_default();
-        if app_insights_key.is_empty()
-        {
-            let tracer = sdk::export::trace::stdout::new_pipeline()
-                .install_simple();
 
-            let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
-            let subscriber = Registry::default().with(telemetry);
-            
+        if !honeycomb_key.is_empty() {
+            let config = libhoney::Config {
+                options: libhoney::client::Options {
+                    api_key: honeycomb_key,
+                    dataset: "bender.sierrasoftworks.com".to_string(),
+                    ..Default::default()
+                },
+                transmission_options: libhoney::transmission::Options::default(),
+            };
+
+            let telemetry = new_honeycomb_telemetry_layer("Bender", config);
+            let subscriber = Registry::default()
+                .with(LevelFilter::INFO)
+                .with(tracing_subscriber::fmt::Layer::default())
+                .with(telemetry);
             tracing::subscriber::set_global_default(subscriber).unwrap_or_default();
-
-            // tracing_subscriber::fmt()
-            //     .with_max_level(tracing::Level::INFO)
-            //     .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE)
-            //     .init();
-
+    
             Self {
             }
-        } else {
+        } else if !app_insights_key.is_empty() {
             let tracer = opentelemetry_application_insights::new_pipeline(
                 app_insights_key
             )
@@ -42,6 +48,23 @@ impl Session {
             let subscriber = Registry::default().with(telemetry);
             tracing::subscriber::set_global_default(subscriber).unwrap_or_default();
     
+            Self {
+            }
+        } else {
+            
+            let tracer = sdk::export::trace::stdout::new_pipeline()
+                .install_simple();
+
+            let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+            let subscriber = Registry::default().with(telemetry);
+            
+            tracing::subscriber::set_global_default(subscriber).unwrap_or_default();
+
+            // tracing_subscriber::fmt()
+            //     .with_max_level(tracing::Level::INFO)
+            //     .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE)
+            //     .init();
+
             Self {
             }
         }
