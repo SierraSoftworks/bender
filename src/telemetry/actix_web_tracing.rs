@@ -64,6 +64,7 @@ where
             "http.status_code" = tracing::field::Empty,
             "http.method" = %req.method(),
             "http.url" = %req.match_pattern().unwrap_or(req.path().into()),
+            "app.version" = env!("CARGO_PKG_VERSION"),
         );
     
         {

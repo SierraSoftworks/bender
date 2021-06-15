@@ -8,7 +8,6 @@ pub struct Session {}
 
 impl Session {
     pub fn new() -> Self {
-        //env_logger::init();
         LogTracer::init().unwrap();
 
         let honeycomb_layer = match std::env::var("HONEYCOMB_KEY").ok() {
