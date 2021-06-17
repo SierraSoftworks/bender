@@ -44,7 +44,7 @@ impl Responder for QuoteV1 {
             "application/json"
         }).unwrap_or("application/json");
 
-        Span::current().record("http.content_type", content_type);
+        Span::current().record("http.content_type", &tracing::field::display(content_type));
 
         info!({ http.content_type = %content_type}, "Rendering quote");
 
