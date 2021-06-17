@@ -77,10 +77,21 @@ where
             Span::current().set_parent(context.clone());
         }
 
-        let fut = self.service.call(req);
+        let handler_span = tracing::info_span!(
+            "request.handler",
+            "otel.kind" = "internal"
+        );
+
+        let fut = {
+            let _enter = handler_span.enter();
+            self.service.call(req)
+        };
+        
         Box::pin(
             async move {
-                let outcome = fut.instrument(tracing::info_span!("request.handler", "otel.kind"="internal")).await;
+                let outcome = fut
+                    .instrument(handler_span)
+                    .await;
                 let status_code = match &outcome {
                     Ok(response) => response.response().status(),
                     Err(error) => error.as_response_error().status_code(),
