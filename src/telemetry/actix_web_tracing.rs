@@ -74,7 +74,7 @@ where
 
             register_dist_tracing_root(TraceId::new(), None).unwrap();
             
-            Span::current().set_parent(context.clone());
+            Span::current().set_parent(context);
         }
 
         let handler_span = tracing::info_span!(
