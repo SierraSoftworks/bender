@@ -2805,9 +2805,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-honeycomb"
-version = "0.4.1"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad74a6fc7dbc518f242e0af1ae3f31236318458b3de58565daba65a01d897310"
+checksum = "414d06acbc39a0b8f9bec4abe5893dcaad5e8257a83496f8d0f247c33258e9f1"
 dependencies = [
  "chrono",
  "libhoney-rust",
