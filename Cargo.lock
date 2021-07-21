@@ -418,7 +418,7 @@ dependencies = [
  "libhoney-rust",
  "log",
  "mime",
- "opentelemetry 0.14.0",
+ "opentelemetry 0.15.0",
  "opentelemetry-application-insights",
  "rand 0.8.4",
  "reqwest 0.11.4",
@@ -1546,6 +1546,23 @@ name = "opentelemetry"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "492848ff47f11b7f9de0443b404e2c5775f695e1af6b7076ca25f999581d547a"
+dependencies = [
+ "async-trait",
+ "crossbeam-channel",
+ "futures",
+ "js-sys",
+ "lazy_static",
+ "percent-encoding",
+ "pin-project",
+ "rand 0.8.4",
+ "thiserror",
+]
+
+[[package]]
+name = "opentelemetry"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ff27b33e30432e7b9854936693ca103d8591b0501f7ae9f633de48cda3bf2a67"
 dependencies = [
  "async-trait",
  "crossbeam-channel",
