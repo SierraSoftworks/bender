@@ -322,18 +322,20 @@ checksum = "cdb031dd78e28731d87d56cc8ffef4a8f36ca26c38fe2de700543e627f8a464a"
 [[package]]
 name = "azure_core"
 version = "0.1.0"
-source = "git+https://github.com/azure/azure-sdk-for-rust#457bd53107d31f7ccd6cae7128dfaa25f5268679"
+source = "git+https://github.com/azure/azure-sdk-for-rust#08090ef44b5b4a8393d5beaf385bf39f9175812c"
 dependencies = [
  "async-trait",
  "bytes 1.0.1",
  "chrono",
  "dyn-clone",
  "futures",
+ "getrandom 0.2.3",
  "http",
  "log",
  "oauth2",
- "rand 0.7.3",
+ "rand 0.8.4",
  "reqwest 0.11.4",
+ "rustc_version 0.4.0",
  "serde",
  "serde_derive",
  "serde_json",
@@ -345,7 +347,7 @@ dependencies = [
 [[package]]
 name = "azure_storage"
 version = "0.1.0"
-source = "git+https://github.com/azure/azure-sdk-for-rust#457bd53107d31f7ccd6cae7128dfaa25f5268679"
+source = "git+https://github.com/azure/azure-sdk-for-rust#08090ef44b5b4a8393d5beaf385bf39f9175812c"
 dependencies = [
  "RustyXML",
  "azure_core",
@@ -894,8 +896,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fcd999463524c52659517fe2cea98493cfe485d10565e7b0fb07dbba7ad2753"
 dependencies = [
  "cfg-if 1.0.0",
+ "js-sys",
  "libc",
  "wasi 0.10.2+wasi-snapshot-preview1",
+ "wasm-bindgen",
 ]
 
 [[package]]
