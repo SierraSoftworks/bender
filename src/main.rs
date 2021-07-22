@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()> {
     info!("Starting server on :{}", listen_on);
     HttpServer::new(move || {
         App::new()
-            .data(state.clone())
+            .app_data(state.clone())
             .wrap(telemetry::TracingLogger)
             .configure(api::configure)
     })

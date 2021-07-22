@@ -21,7 +21,7 @@ impl Loader for BlobLoader {
     #[instrument(err, skip(self, state), fields(otel.kind = "internal"))]
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), APIError> {
         debug!("Initializing Azure Blob storage client");
-        let http_client: Arc<Box<dyn HttpClient>> = Arc::new(Box::new(reqwest::Client::new()));
+        let http_client: Arc<dyn HttpClient> = Arc::new(reqwest::Client::new());
 
         let storage_client = StorageAccountClient::new_connection_string(http_client.clone(), self.connection_string.as_str())
             .map_err(|err| {
