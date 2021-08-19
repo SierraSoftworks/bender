@@ -9,7 +9,7 @@ extern crate rand;
 #[macro_use] extern crate tracing;
 #[macro_use] extern crate sentry;
 
-use actix_web::{App, HttpServer};
+use actix_web::{App, HttpServer, web::Data};
 use telemetry::Session;
 use tracing::{Instrument, info_span};
 
@@ -48,7 +48,7 @@ async fn main() -> std::io::Result<()> {
     info!("Starting server on :{}", listen_on);
     HttpServer::new(move || {
         App::new()
-            .app_data(state.clone())
+            .app_data(Data::new(state.clone()))
             .wrap(telemetry::TracingLogger)
             .configure(api::configure)
     })

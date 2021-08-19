@@ -72,7 +72,7 @@ where
             // Propagate OpenTelemetry parent span context information
             let context  = propagator.extract(&HeaderMapExtractor { headers: req.headers() });
 
-            register_dist_tracing_root(TraceId::new(), None).unwrap();
+            register_dist_tracing_root(TraceId::new(), None).unwrap_or_default();
             
             Span::current().set_parent(context);
         }
