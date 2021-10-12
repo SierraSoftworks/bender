@@ -9,7 +9,7 @@ edition = "2018"
 [dependencies]
 actix = "0.12"
 actix-rt = "2.3"
-actix-service = "2.0.0-beta.5"
+actix-service = "2.0.1"
 actix-web = "4.0.0-beta.5"
 async-trait = "0.1.50"
 azure_core = { git = "https://github.com/azure/azure-sdk-for-rust" }
