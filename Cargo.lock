@@ -2790,9 +2790,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-actix-web"
-version = "0.4.0-beta.15"
+version = "0.5.0-beta.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5d25e8e2381e03c36530607daea5663488a21a1b75db0431cf9b961e9ca8a02"
+checksum = "42294d195afb0ae79ea237040399179a8b5050b454c210fe4566ed383c6f0c17"
 dependencies = [
  "actix-web",
  "pin-project",
