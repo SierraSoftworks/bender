@@ -51,9 +51,9 @@ dependencies = [
 
 [[package]]
 name = "actix-http"
-version = "3.0.0-beta.13"
+version = "3.0.0-beta.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1bc3f9d97e32d75fae3ad7d955ac005eea3fd3ea60a89132768700911a60fd94"
+checksum = "055b723746f19534fc5c9a210788686542986d6f1b9cb2900a297bb4c6619f3b"
 dependencies = [
  "actix-codec",
  "actix-rt",
@@ -164,9 +164,9 @@ dependencies = [
 
 [[package]]
 name = "actix-web"
-version = "4.0.0-beta.12"
+version = "4.0.0-beta.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e87cfc4efaad42f8a054e269d1b85046397ff4e8707e49128dea3f99a512a9d6"
+checksum = "1657eb2ed5e8ef246b6e951bafb38644ca433042a65a44f02e5601083b71b895"
 dependencies = [
  "actix-codec",
  "actix-http",
@@ -192,7 +192,7 @@ dependencies = [
  "mime",
  "once_cell",
  "paste",
- "pin-project",
+ "pin-project-lite 0.2.7",
  "regex",
  "serde",
  "serde_json",
@@ -2779,9 +2779,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-actix-web"
-version = "0.5.0-beta.3"
+version = "0.5.0-beta.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "994e4a59135823bdca121a8d086e3fcc71741c8677b47fa95a6afdd15e8f646f"
+checksum = "a90ef8ed903a84ce2c0cf35bd2896e55e22eaa5e2b49c4f16167f4615bb204ac"
 dependencies = [
  "actix-web",
  "pin-project",
