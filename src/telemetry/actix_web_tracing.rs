@@ -6,7 +6,6 @@ use actix_web::dev::*;
 use futures::{Future, future::{ok, Ready}};
 use opentelemetry::{propagation::{Extractor, TextMapPropagator}, sdk::propagation::TraceContextPropagator};
 use tracing::{Instrument, Span};
-use tracing_honeycomb::{TraceId, register_dist_tracing_root};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 pub struct TracingLogger;
@@ -67,15 +66,10 @@ where
             "app.version" = env!("CARGO_PKG_VERSION"),
         );
     
-        {
-            let _enter = span.enter();
-            // Propagate OpenTelemetry parent span context information
-            let context  = propagator.extract(&HeaderMapExtractor { headers: req.headers() });
+        // Propagate OpenTelemetry parent span context information
+        let context  = propagator.extract(&HeaderMapExtractor { headers: req.headers() });
 
-            register_dist_tracing_root(TraceId::new(), None).unwrap_or_default();
-            
-            Span::current().set_parent(context);
-        }
+        span.set_parent(context);
 
         let handler_span = {
             let _enter = span.enter();

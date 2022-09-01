@@ -7,13 +7,14 @@ extern crate mime;
 extern crate tokio;
 extern crate rand;
 #[macro_use] extern crate tracing;
-#[macro_use] extern crate sentry;
+extern crate sentry;
 
 use actix_web::{App, HttpServer, web::Data};
 use telemetry::Session;
 use tracing::{Instrument, info_span};
 
 mod api;
+#[macro_use] mod macros;
 mod models;
 mod store;
 mod telemetry;
@@ -25,14 +26,6 @@ fn get_listening_port() -> u16 {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     let _session = Session::new();
-
-    let _raven = sentry::init((
-        "https://950ba56ab61a4abcb3679b1117158c33@o219072.ingest.sentry.io/1362607",
-        sentry::ClientOptions {
-            release: release_name!(),
-            ..Default::default()
-        },
-    ));
 
     let state = api::GlobalState::new();
 
