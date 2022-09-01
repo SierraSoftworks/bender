@@ -75,11 +75,11 @@ pub struct BlobQuoteV1 {
     pub who: String,
 }
 
-impl Into<Quote> for BlobQuoteV1 {
-    fn into(self) -> Quote {
+impl From<BlobQuoteV1> for Quote {
+    fn from(val: BlobQuoteV1) -> Self {
         Quote {
-            quote: self.quote.clone(),
-            who: self.who.clone(),
+            quote: val.quote.clone(),
+            who: val.who,
         }
     }
 }
@@ -88,7 +88,7 @@ impl From<Quote> for BlobQuoteV1 {
     fn from(state: Quote) -> Self {
         Self {
             quote: state.quote.clone(),
-            who: state.who.clone(),
+            who: state.who,
         }
     }
 }

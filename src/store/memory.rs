@@ -93,9 +93,9 @@ impl Handler<GetQuote> for MemoryStore {
         });
 
         quote
-            .ok_or({
+            .ok_or_else(|| 
                 APIError::new(404, "Not Found", "There are no quotes available right now, please add one and try again.")
-            })
+            )
             .map(|q| {
                 q.clone()
             })
@@ -111,7 +111,7 @@ impl Handler<GetHealth> for MemoryStore {
     fn handle(&mut self, _: GetHealth, _: &mut Self::Context) -> Self::Result {
         Ok(Health {
             ok: true,
-            started_at: self.started_at.clone(),
+            started_at: self.started_at,
         })
     }
 }

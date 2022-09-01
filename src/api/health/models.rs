@@ -11,10 +11,10 @@ impl From<Health> for HealthV1 {
     }
 }
 
-impl Into<Health> for HealthV1 {
-    fn into(self) -> Health {
+impl From<HealthV1> for Health {
+    fn from(val: HealthV1) -> Self {
         Health {
-            ok: self.ok,
+            ok: val.ok,
             started_at: chrono::Utc::now(),
         }
     }
@@ -28,11 +28,11 @@ pub struct HealthV2 {
     pub started_at: chrono::DateTime<chrono::Utc>,
 }
 
-impl Into<Health> for HealthV2 {
-    fn into(self) -> Health {
+impl From<HealthV2> for Health {
+    fn from(val: HealthV2) -> Self {
         Health {
-            ok: self.ok,
-            started_at: self.started_at,
+            ok: val.ok,
+            started_at: val.started_at,
         }
     }
 }

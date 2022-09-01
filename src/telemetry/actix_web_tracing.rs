@@ -1,6 +1,6 @@
 use std::{pin::Pin, task::{Context, Poll}};
 
-use actix_web::{Error, http::HeaderMap};
+use actix_web::{Error, http::header::HeaderMap};
 use actix_service::*;
 use actix_web::dev::*;
 use futures::{Future, future::{ok, Ready}};
@@ -62,12 +62,12 @@ where
             "http.user_agent" = %user_agent,
             "http.status_code" = tracing::field::Empty,
             "http.method" = %req.method(),
-            "http.url" = %req.match_pattern().unwrap_or(req.path().into()),
+            "http.url" = %req.match_pattern().unwrap_or_else(|| req.path().into()),
             "app.version" = env!("CARGO_PKG_VERSION"),
         );
     
         // Propagate OpenTelemetry parent span context information
-        let context  = propagator.extract(&HeaderMapExtractor { headers: req.headers() });
+        let context  = propagator.extract(&HeaderMapExtractor::from(req.headers()));
 
         span.set_parent(context);
 
@@ -103,6 +103,12 @@ where
 
 struct HeaderMapExtractor<'a> {
     headers: &'a HeaderMap
+}
+
+impl<'a> From<&'a HeaderMap> for HeaderMapExtractor<'a> {
+    fn from(headers: &'a HeaderMap) -> Self {
+        HeaderMapExtractor { headers }
+    }
 }
 
 impl<'a> Extractor for HeaderMapExtractor<'a> {

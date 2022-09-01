@@ -11,7 +11,7 @@ pub struct APIError {
 impl APIError {
     pub fn new(code: u16, error: &str, message: &str) -> Self {
         Self {
-            code: code,
+            code,
             error: error.to_string(),
             message: message.to_string(),
         }
@@ -48,8 +48,8 @@ impl From<actix::MailboxError> for APIError {
     }
 }
 
-impl Into<std::io::Error> for APIError {
-    fn into(self) -> std::io::Error {
+impl From<APIError> for std::io::Error {
+    fn from(_val: APIError) -> Self {
         std::io::ErrorKind::Other.into()
     }
 }

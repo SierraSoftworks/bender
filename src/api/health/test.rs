@@ -7,11 +7,11 @@ use actix_web::{test, App};
 
 #[actix_rt::test]
 async fn health_v1_status() {
-    let mut app =
+    let app =
         test::init_service(App::new().app_data(Data::new(GlobalState::new())).configure(configure)).await;
 
     let req = test::TestRequest::with_uri("/api/v1/health").to_request();
-    let response = test::call_service(&mut app, req).await;
+    let response = test::call_service(&app, req).await;
 
     assert!(response.status().is_success());
 }
@@ -20,21 +20,21 @@ async fn health_v1_status() {
 async fn health_v1_content() {
     let state = GlobalState::new();
 
-    let mut app = test::init_service(App::new().app_data(Data::new(state)).configure(configure)).await;
+    let app = test::init_service(App::new().app_data(Data::new(state)).configure(configure)).await;
 
     let req = test::TestRequest::with_uri("/api/v1/health").to_request();
-    let response: models::HealthV1 = test::read_response_json(&mut app, req).await;
+    let response: models::HealthV1 = test::call_and_read_body_json(&app, req).await;
 
-    assert_eq!(response.ok, true);
+    assert!(response.ok);
 }
 
 #[actix_rt::test]
 async fn health_v2_status() {
-    let mut app =
+    let app =
         test::init_service(App::new().app_data(Data::new(GlobalState::new())).configure(configure)).await;
 
     let req = test::TestRequest::with_uri("/api/v2/health").to_request();
-    let response = test::call_service(&mut app, req).await;
+    let response = test::call_service(&app, req).await;
 
     assert!(response.status().is_success());
 }
@@ -43,11 +43,11 @@ async fn health_v2_status() {
 async fn health_v2_content() {
     let state = GlobalState::new();
 
-    let mut app = test::init_service(App::new().app_data(Data::new(state.clone())).configure(configure)).await;
+    let app = test::init_service(App::new().app_data(Data::new(state.clone())).configure(configure)).await;
 
     let req = test::TestRequest::with_uri("/api/v2/health").to_request();
-    let response: models::HealthV2 = test::read_response_json(&mut app, req).await;
+    let response: models::HealthV2 = test::call_and_read_body_json(&app, req).await;
 
-    assert_eq!(response.ok, true);
+    assert!(response.ok);
     assert_eq!(response.started_at, state.store.send(GetHealth{}).await.unwrap().unwrap().started_at);
 }

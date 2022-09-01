@@ -51,11 +51,11 @@ pub struct FileQuoteV1 {
     pub who: String,
 }
 
-impl Into<Quote> for FileQuoteV1 {
-    fn into(self) -> Quote {
+impl From<FileQuoteV1> for Quote {
+    fn from(val: FileQuoteV1) -> Self {
         Quote {
-            quote: self.quote.clone(),
-            who: self.who.clone(),
+            quote: val.quote.clone(),
+            who: val.who,
         }
     }
 }
@@ -64,7 +64,7 @@ impl From<Quote> for FileQuoteV1 {
     fn from(state: Quote) -> Self {
         Self {
             quote: state.quote.clone(),
-            who: state.who.clone(),
+            who: state.who,
         }
     }
 }
