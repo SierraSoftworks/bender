@@ -11,11 +11,11 @@ impl Session {
         let raven = sentry::init((
             "https://950ba56ab61a4abcb3679b1117158c33@o219072.ingest.sentry.io/1362607",
             sentry::ClientOptions {
-                release: Some(version!("git-tool@v").into()),
+                release: Some(version!("bender@v").into()),
                 #[cfg(debug_assertions)]
                 environment: Some("Development".into()),
                 #[cfg(not(debug_assertions))]
-                environment: Some("Customer".into()),
+                environment: Some("Production".into()),
                 default_integrations: true,
                 attach_stacktrace: true,
                 send_default_pii: false,
