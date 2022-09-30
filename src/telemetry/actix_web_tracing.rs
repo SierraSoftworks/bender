@@ -45,14 +45,12 @@ where
     }
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
-        let propagator = TraceContextPropagator::new();
-
         let user_agent = req
             .headers()
             .get("User-Agent")
             .map(|h| h.to_str().unwrap_or(""))
             .unwrap_or("");
-
+        
         let span = tracing::info_span!(
             "request",
             "otel.kind" = "server",
@@ -65,31 +63,22 @@ where
             "http.method" = %req.method(),
             "http.url" = %req.match_pattern().unwrap_or_else(|| req.path().into()),
         );
-    
-        // Propagate OpenTelemetry parent span context information
-        let context  = propagator.extract(&HeaderMapExtractor::from(req.headers()));
-
-        span.set_parent(context);
-
-        let handler_span = {
-            let _enter = span.enter();
-            tracing::info_span!(
-                "request.handler",
-                "otel.kind" = "internal",
-                "otel.name" = req.match_name().unwrap_or("<default>"),
-            )
-        };
 
         let fut = {
-            let _enter = handler_span.enter();
+            let _enter = span.enter();
+
+            let propagator = TraceContextPropagator::new();
+            // Propagate OpenTelemetry parent span context information
+            let context  = propagator.extract(&HeaderMapExtractor::from(req.headers()));
+    
+            span.set_parent(context);
+
             self.service.call(req)
         };
         
         Box::pin(
             async move {
-                let outcome = fut
-                    .instrument(handler_span)
-                    .await;
+                let outcome = fut.await;
                 let status_code = match &outcome {
                     Ok(response) => response.response().status(),
                     Err(error) => error.as_response_error().status_code(),
