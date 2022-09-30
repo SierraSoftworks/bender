@@ -62,6 +62,7 @@ where
             "http.status_code" = tracing::field::Empty,
             "http.method" = %req.method(),
             "http.url" = %req.match_pattern().unwrap_or_else(|| req.path().into()),
+            "http.headers" = ?req.headers(),
         );
 
         let fut = {
