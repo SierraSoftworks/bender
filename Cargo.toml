@@ -11,7 +11,7 @@ actix = "0.13"
 actix-rt = "2.7"
 actix-service = "2.0.2"
 actix-web = "4.2"
-async-trait = "0.1.58"
+async-trait = "0.1.59"
 azure_core = { git = "https://github.com/azure/azure-sdk-for-rust" }
 azure_storage = { git = "https://github.com/azure/azure-sdk-for-rust", features = ["blob"] }
 chrono = { version = "0.4", features = ["serde"] }
