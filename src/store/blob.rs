@@ -1,14 +1,12 @@
 use actix::prelude::*;
-use azure_core::HttpClient;
+use azure_storage::{ConnectionString, StorageCredentials};
+use azure_storage_blobs::prelude::*;
 use tracing::*;
 use tracing_futures::Instrument;
 use super::{Loader, Store};
 use crate::{api::APIError, models::*};
 use crate::telemetry::*;
-use std::{path::PathBuf, sync::Arc};
-
-use azure_storage::core::prelude::*;
-use azure_storage::blob::prelude::*;
+use std::{path::PathBuf};
 
 pub struct BlobLoader {
     pub connection_string: String,
@@ -21,23 +19,28 @@ impl Loader for BlobLoader {
     #[instrument(err, skip(self, state), fields(otel.kind = "internal"))]
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), APIError> {
         debug!("Initializing Azure Blob storage client");
-        let http_client: Arc<dyn HttpClient> = Arc::new(reqwest::Client::new());
 
-        let storage_client = StorageAccountClient::new_connection_string(http_client.clone(), self.connection_string.as_str())
+        let connection_string = ConnectionString::new(self.connection_string.as_str())
             .map_err(|err| {
-                error!({ exception.message = %err }, "Unable to create Azure Blob Storage client");
+                error!({ exception.message = %err }, "Unable to parse Azure Blob Storage connection string");
                 APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
             })?;
 
-        let blob_client = storage_client
-            .as_storage_client()
-            .as_container_client(&self.container)
-            .as_blob_client(&self.path.to_string_lossy().to_string());
+        let account = connection_string.account_name.ok_or_else(|| {
+            error!("Unable to parse Azure Blob Storage connection string, it is missing the account name field");
+            APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
+        })?;
+
+        let access_key = connection_string.account_key.ok_or_else(|| {
+            error!("Unable to parse Azure Blob Storage connection string, it is missing the account key field");
+            APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
+        })?;
+
+        let blob_client = ClientBuilder::new(account, StorageCredentials::Key(account.into(), access_key.into())).blob_client(&self.container, self.path.to_string_lossy().to_string());
 
         debug!("Fetching {}", self.path.display());
         let blob = blob_client
-                    .get()
-                    .execute()
+                    .get_content()
                     .instrument(info_span!("get_blob", "otel.kind" = "client", db.system = "azure_storage", db.instance = self.container.as_str(), db.statement = format!("GET {}", self.path.display()).as_str()))
                     .await
                     .map_err(|err| {
@@ -45,7 +48,7 @@ impl Loader for BlobLoader {
                         APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
                     })?;
 
-        let fc: Vec<BlobQuoteV1> = debug_span!("deserialize").in_scope(|| serde_json::from_slice(&blob.data) )
+        let fc: Vec<BlobQuoteV1> = debug_span!("deserialize").in_scope(|| serde_json::from_slice(&blob) )
             .map_err(|err| {
                 error!({ exception.message = %err }, "Unable to parse quote file.");
                 APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
