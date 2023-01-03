@@ -23,7 +23,7 @@ COPY . .
 RUN cargo test --release && rm -rf target/x86_64-unknown-linux-musl/release/deps/bender*
 
 # Build the final executable of the project
-RUN cargo build --release --bin bender --features "table_storage" --locked
+RUN cargo build --release --bin bender --locked
 
 # Ensure that the binary is at a known location for the next stage
 RUN mkdir /out && \
