@@ -28,7 +28,7 @@ dependencies = [
  "parking_lot 0.12.1",
  "pin-project-lite 0.2.9",
  "smallvec",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tokio-util 0.7.4",
 ]
 
@@ -45,7 +45,7 @@ dependencies = [
  "log",
  "memchr",
  "pin-project-lite 0.2.9",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tokio-util 0.7.4",
 ]
 
@@ -117,7 +117,7 @@ checksum = "7ea16c295198e958ef31930a6ef37d0fb64e9ca3b6116e6b93a8bdae96ee1000"
 dependencies = [
  "actix-macros",
  "futures-core",
- "tokio 1.23.0",
+ "tokio 1.23.1",
 ]
 
 [[package]]
@@ -134,7 +134,7 @@ dependencies = [
  "mio 0.8.5",
  "num_cpus",
  "socket2 0.4.7",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tracing 0.1.37",
 ]
 
@@ -520,7 +520,7 @@ dependencies = [
  "sentry",
  "serde",
  "serde_json",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tonic",
  "tracing 0.2.0",
  "tracing-attributes 0.2.0",
@@ -1205,7 +1205,7 @@ dependencies = [
  "http",
  "indexmap",
  "slab",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tokio-util 0.7.4",
  "tracing 0.1.37",
 ]
@@ -1381,7 +1381,7 @@ dependencies = [
  "itoa 1.0.5",
  "pin-project-lite 0.2.9",
  "socket2 0.4.7",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tower-service",
  "tracing 0.1.37",
  "want",
@@ -1411,7 +1411,7 @@ checksum = "bbb958482e8c7be4bc3cf272a766a2b0bf1a6755e7a6ae777f017a31d11b13b1"
 dependencies = [
  "hyper 0.14.23",
  "pin-project-lite 0.2.9",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tokio-io-timeout",
 ]
 
@@ -1424,7 +1424,7 @@ dependencies = [
  "bytes 1.3.0",
  "hyper 0.14.23",
  "native-tls",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tokio-native-tls",
 ]
 
@@ -1934,7 +1934,7 @@ dependencies = [
  "opentelemetry-proto",
  "prost",
  "thiserror",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tonic",
 ]
 
@@ -1986,7 +1986,7 @@ dependencies = [
  "percent-encoding",
  "rand 0.8.5",
  "thiserror",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tokio-stream",
 ]
 
@@ -2501,7 +2501,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_urlencoded",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tokio-native-tls",
  "tokio-util 0.7.4",
  "tower-service",
@@ -2698,7 +2698,7 @@ dependencies = [
  "sentry-contexts",
  "sentry-core",
  "sentry-panic",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "ureq",
 ]
 
@@ -3066,9 +3066,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.23.0"
+version = "1.23.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eab6d665857cc6ca78d6e80303a02cea7a7851e85dfbd77cbdc09bd129f1ef46"
+checksum = "38a54aca0c15d014013256222ba0ebed095673f89345dd79119d912eb561b7a8"
 dependencies = [
  "autocfg 1.1.0",
  "bytes 1.3.0",
@@ -3101,7 +3101,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "30b74022ada614a1b4834de765f9bb43877f910cc8ce4be40e89042c9223a8bf"
 dependencies = [
  "pin-project-lite 0.2.9",
- "tokio 1.23.0",
+ "tokio 1.23.1",
 ]
 
 [[package]]
@@ -3122,7 +3122,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7d995660bd2b7f8c1568414c1126076c13fbb725c40112dc0120b78eb9b717b"
 dependencies = [
  "native-tls",
- "tokio 1.23.0",
+ "tokio 1.23.1",
 ]
 
 [[package]]
@@ -3144,7 +3144,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c43ee83903113e03984cb9e5cebe6c04a5116269e900e3ddba8f068a62adda59"
 dependencies = [
  "rustls 0.20.7",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "webpki 0.22.0",
 ]
 
@@ -3156,7 +3156,7 @@ checksum = "d660770404473ccd7bc9f8b28494a811bc18542b915c0855c51e8f419d5223ce"
 dependencies = [
  "futures-core",
  "pin-project-lite 0.2.9",
- "tokio 1.23.0",
+ "tokio 1.23.1",
 ]
 
 [[package]]
@@ -3200,7 +3200,7 @@ dependencies = [
  "futures-core",
  "futures-sink",
  "pin-project-lite 0.2.9",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tracing 0.1.37",
 ]
 
@@ -3228,7 +3228,7 @@ dependencies = [
  "prost-derive",
  "rustls-native-certs",
  "rustls-pemfile",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tokio-rustls 0.23.4",
  "tokio-stream",
  "tokio-util 0.7.4",
@@ -3265,7 +3265,7 @@ dependencies = [
  "pin-project-lite 0.2.9",
  "rand 0.8.5",
  "slab",
- "tokio 1.23.0",
+ "tokio 1.23.1",
  "tokio-util 0.7.4",
  "tower-layer",
  "tower-service",
