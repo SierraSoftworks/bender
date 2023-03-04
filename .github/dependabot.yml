@@ -4,9 +4,11 @@ updates:
   directory: "/"
   schedule:
     interval: daily
-  open-pull-requests-limit: 10
 - package-ecosystem: github-actions
   directory: .github/workflows
   schedule:
     interval: daily
-  open-pull-requests-limit: 5
+- package-ecosystem: terraform
+  directory: "/infra"
+  schedule:
+    interval: daily
