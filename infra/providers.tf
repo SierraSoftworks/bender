@@ -49,3 +49,20 @@ provider "azuread" {
 provider "honeycombio" {
   # You can set the API key with the environment variable HONEYCOMB_API_KEY
 }
+
+
+variable "azure_subscription" {
+
+}
+
+variable "azure_tenant" {
+
+}
+
+variable "azure_client_id" {
+  sensitive = true
+}
+
+variable "azure_client_secret" {
+  sensitive = true
+}
