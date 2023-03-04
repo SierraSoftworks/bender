@@ -35,6 +35,7 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates
 
 COPY --from=builder /out/bender /app/bender
+ADD ./quotes.json /app/quotes.json
 
 WORKDIR /app
 CMD [ "/app/bender" ]
