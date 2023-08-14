@@ -66,7 +66,7 @@ impl Session {
                             .unwrap_or_default()
                     },
                 ))
-                .with(tracing_opentelemetry::subscriber().with_tracer(tracer))
+                .with(tracing_opentelemetry::layer().with_exception_field_propagation(true).with_exception_fields(true).with_tracer(tracer))
                 .init();
         }
         

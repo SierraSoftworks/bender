@@ -4,7 +4,7 @@ use actix_web::{Error, http::header::HeaderMap};
 use actix_service::*;
 use actix_web::dev::*;
 use futures::{Future, future::{ok, Ready}};
-use opentelemetry::{propagation::{Extractor, TextMapPropagator}, sdk::propagation::TraceContextPropagator};
+use opentelemetry::{propagation::{Extractor, TextMapPropagator}, sdk::propagation::TraceContextPropagator, trace::FutureExt};
 use tracing::{Instrument, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
@@ -65,15 +65,17 @@ where
             "http.headers" = ?req.headers(),
         );
 
+        let propagator = TraceContextPropagator::new();
+
+        // Propagate OpenTelemetry parent span context information
+        let context  = propagator.extract(&HeaderMapExtractor::from(req.headers()));
+
+        // TODO(bpannell): Re-enable this once https://github.com/tokio-rs/tracing-opentelemetry/issues/45 is fixed
+        //span.set_parent(context);
+
         let fut = {
-            let _enter = span.enter();
-
-            let propagator = TraceContextPropagator::new();
-            // Propagate OpenTelemetry parent span context information
-            let context  = propagator.extract(&HeaderMapExtractor::from(req.headers()));
-    
-            span.set_parent(context);
-
+            let _entered = span.enter();
+            
             self.service.call(req)
         };
         

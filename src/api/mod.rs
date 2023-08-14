@@ -4,7 +4,7 @@ pub mod error;
 mod macros;
 
 pub use error::APIError;
-pub use crate::models::{GlobalState};
+pub use crate::models::GlobalState;
 
 use actix_web::web;
 

@@ -30,7 +30,7 @@ impl<T> TraceMessageExt for T where T : Message {
     fn with_span(self, span: Span) -> TraceMessage<Self> {
         TraceMessage {
             message: self,
-            span
+            span: span.or_current()
         }
     }
 }
