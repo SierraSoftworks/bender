@@ -2821,7 +2821,7 @@ dependencies = [
 [[package]]
 name = "tracing-attributes"
 version = "0.2.0"
-source = "git+https://github.com/SierraSoftworks/tracing.git#87bb7fdc3ed35de9febad7281fffa6b36a22a3c1"
+source = "git+https://github.com/SierraSoftworks/tracing.git#4761bb57df87ebf09f7b6949e41fc0b38cc90823"
 dependencies = [
  "proc-macro2",
  "quote",
