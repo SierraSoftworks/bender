@@ -441,9 +441,9 @@ dependencies = [
 
 [[package]]
 name = "azure_core"
-version = "0.13.0"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86b0f0eea648347e40f5f7f7e6bfea4553bcefad0fbf52044ea339e5ce3aba61"
+checksum = "2331555a3618a32516c6172a63e9fec4af0edb43c6fcfeb5303a0716fc34498b"
 dependencies = [
  "async-trait",
  "base64 0.21.2",
@@ -548,7 +548,7 @@ dependencies = [
  "actix-service",
  "actix-web",
  "async-trait",
- "azure_core 0.13.0",
+ "azure_core 0.14.0",
  "azure_storage",
  "azure_storage_blobs",
  "chrono",
