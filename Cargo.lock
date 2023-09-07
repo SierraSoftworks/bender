@@ -444,7 +444,9 @@ dependencies = [
  "log",
  "paste",
  "pin-project",
+ "quick-xml",
  "rand 0.8.5",
+ "reqwest",
  "rustc_version",
  "serde",
  "serde_json",
@@ -479,6 +481,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "azure_storage"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16565073e533053f4e29e6b139de2af758e984108a1cddbb1a432387e7f4474d"
+dependencies = [
+ "RustyXML",
+ "async-trait",
+ "azure_core 0.14.0",
+ "bytes",
+ "futures",
+ "hmac",
+ "log",
+ "once_cell",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sha2",
+ "time 0.3.25",
+ "url",
+ "uuid 1.4.1",
+]
+
+[[package]]
 name = "azure_storage_blobs"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -486,7 +511,7 @@ checksum = "e0d8edb1630aa31452896fc6450ae151f89cc6374da4c034959b17d163dd352f"
 dependencies = [
  "RustyXML",
  "azure_core 0.8.0",
- "azure_storage",
+ "azure_storage 0.9.0",
  "base64 0.13.1",
  "bytes",
  "futures",
@@ -538,7 +563,7 @@ dependencies = [
  "actix-web",
  "async-trait",
  "azure_core 0.14.0",
- "azure_storage",
+ "azure_storage 0.14.0",
  "azure_storage_blobs",
  "chrono",
  "env_logger",
@@ -1811,6 +1836,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "quick-xml"
+version = "0.30.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eff6510e86862b57b210fd8cbe8ed3f0d7d600b9c2863cd4549a2e033c66e956"
+dependencies = [
+ "memchr",
+ "serde",
 ]
 
 [[package]]
