@@ -454,6 +454,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "azure_core"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8e29286b9edfdd6f2c7e9d970bb5b015df8621258acab9ecfcea09b2d7692467"
+dependencies = [
+ "async-trait",
+ "base64 0.21.2",
+ "bytes",
+ "dyn-clone",
+ "futures",
+ "getrandom 0.2.10",
+ "http-types",
+ "log",
+ "paste",
+ "pin-project",
+ "quick-xml",
+ "rand 0.8.5",
+ "reqwest",
+ "rustc_version",
+ "serde",
+ "serde_json",
+ "time",
+ "url",
+ "uuid 1.4.1",
+]
+
+[[package]]
 name = "azure_storage"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -479,6 +506,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "azure_storage"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bed0ccefde57930b2886fd4aed1f70ac469c197b8c2e94828290d71bcbdb5d97"
+dependencies = [
+ "RustyXML",
+ "async-trait",
+ "azure_core 0.16.0",
+ "bytes",
+ "futures",
+ "hmac",
+ "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "sha2",
+ "time",
+ "url",
+ "uuid 1.4.1",
+]
+
+[[package]]
 name = "azure_storage_blobs"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -486,7 +535,7 @@ checksum = "e0d8edb1630aa31452896fc6450ae151f89cc6374da4c034959b17d163dd352f"
 dependencies = [
  "RustyXML",
  "azure_core 0.8.0",
- "azure_storage",
+ "azure_storage 0.9.0",
  "base64 0.13.1",
  "bytes",
  "futures",
@@ -538,7 +587,7 @@ dependencies = [
  "actix-web",
  "async-trait",
  "azure_core 0.15.0",
- "azure_storage",
+ "azure_storage 0.16.0",
  "azure_storage_blobs",
  "chrono",
  "env_logger",
@@ -1813,6 +1862,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "quick-xml"
+version = "0.30.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eff6510e86862b57b210fd8cbe8ed3f0d7d600b9c2863cd4549a2e033c66e956"
+dependencies = [
+ "memchr",
+ "serde",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2585,6 +2644,7 @@ checksum = "b0fdd63d58b18d663fbdf70e049f00a22c8e42be082203be7f26589213cd75ea"
 dependencies = [
  "deranged",
  "itoa",
+ "js-sys",
  "libc",
  "num_threads",
  "serde",
