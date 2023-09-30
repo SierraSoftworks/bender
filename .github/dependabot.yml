@@ -4,6 +4,16 @@ updates:
   directory: "/"
   schedule:
     interval: daily
+  groups:
+    opentelemetry:
+      patterns:
+        - "tracing*"
+        - "opentelemetry*"
+        - "tonic*"
+
+    azure:
+      patterns:
+        - "azure*"
 - package-ecosystem: github-actions
   directory: .github/workflows
   schedule:
