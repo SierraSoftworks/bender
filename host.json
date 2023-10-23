@@ -2,8 +2,8 @@
     "version": "2.0",
     "logging": {},
     "extensionBundle": {
-      "id": "Microsoft.Azure.Functions.ExtensionBundle",
-      "version": "[3.3.0, 4.0.0)"
+        "id": "Microsoft.Azure.Functions.ExtensionBundle",
+        "version": "[4.*, 5.0.0)"
     },
     "extensions": {
         "http": {
@@ -18,5 +18,5 @@
             "arguments": []
         }
     },
-    "functionTimeout": "00:00:01"
+    "functionTimeout": "00:00:02"
 }
