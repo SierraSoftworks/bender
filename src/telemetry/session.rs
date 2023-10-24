@@ -1,3 +1,4 @@
+use opentelemetry::{global, sdk::{propagation::TraceContextPropagator, trace::Sampler}};
 use opentelemetry_otlp::WithExportConfig;
 use sentry::ClientInitGuard;
 use tracing_subscriber::prelude::*;
@@ -54,6 +55,8 @@ impl Session {
                 ))
                 .install_batch(opentelemetry::runtime::Tokio)
                 .unwrap();
+
+            global::set_text_map_propagator(TraceContextPropagator::new());
     
             tracing_subscriber::registry()
                 .with(tracing_subscriber::filter::LevelFilter::DEBUG)

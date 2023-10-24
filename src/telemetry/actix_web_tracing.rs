@@ -3,9 +3,9 @@ use std::{pin::Pin, task::{Context, Poll}};
 use actix_web::{Error, http::header::HeaderMap};
 use actix_service::*;
 use actix_web::dev::*;
-use futures::{Future, future::{ok, Ready}};
-use opentelemetry::{propagation::{Extractor, TextMapPropagator}, sdk::propagation::TraceContextPropagator};
-use tracing::{Instrument, Span};
+use futures::{Future, future::{ok, Ready}, FutureExt};
+use opentelemetry::{propagation::Extractor, global, trace::{TraceContextExt, SpanContext}};
+use tracing::{Instrument, Span, field::display};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 pub struct TracingLogger;
@@ -62,34 +62,39 @@ where
             "http.status_code" = tracing::field::Empty,
             "http.method" = %req.method(),
             "http.url" = %req.match_pattern().unwrap_or_else(|| req.path().into()),
-            "http.headers" = ?req.headers(),
+            "http.headers" = %req.headers().iter().map(|(k, v)| format!("{k}: {v:?}")).collect::<Vec<_>>().join("\n"),
         );
 
-        let propagator = TraceContextPropagator::new();
-
         // Propagate OpenTelemetry parent span context information
-        let context  = propagator.extract(&HeaderMapExtractor::from(req.headers()));
+        let mut context = global::get_text_map_propagator(|propagator| {
+            propagator.extract(&HeaderMapExtractor::from(req.headers()))
+        });
+
+        let span_ref = context.span();
+        let span_context = span_ref.span_context();
+        println!("Span Context: {:?}-{:?}", span_context.trace_id(), span_context.span_id());
+        context = context.with_remote_span_context(SpanContext::new(
+            span_context.trace_id(),
+            span_context.span_id(),
+            span_context.trace_flags().with_sampled(true),
+            true,
+            span_context.trace_state().clone(),
+        ));
 
         span.set_parent(context);
 
-        let fut = {
-            let _entered = span.enter();
-            
-            self.service.call(req)
-        };
-        
-        Box::pin(
-            async move {
-                let outcome = fut.await;
-                let status_code = match &outcome {
-                    Ok(response) => response.response().status(),
-                    Err(error) => error.as_response_error().status_code(),
-                };
-                Span::current().record("http.status_code", status_code.as_u16());
+        let fut = self.service.call(req).map(move |outcome| match &outcome {
+            Ok(response) => {
+                Span::current().record("http.status_code", display(response.response().status()));
                 outcome
-            }
-            .instrument(span),
-        )
+            },
+            Err(error) => {
+                Span::current().record("http.status_code", display(error.as_response_error().status_code()));
+                outcome
+            },
+        }).instrument(span);
+        
+        Box::pin(fut)
     }
 }
 
