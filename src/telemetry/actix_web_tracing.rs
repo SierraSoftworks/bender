@@ -4,7 +4,7 @@ use actix_web::{Error, http::header::HeaderMap};
 use actix_service::*;
 use actix_web::dev::*;
 use futures::{Future, future::{ok, Ready}, FutureExt};
-use opentelemetry::{propagation::Extractor, global, trace::{TraceContextExt, SpanContext}};
+use opentelemetry::{propagation::Extractor, global};
 use tracing::{Instrument, Span, field::display};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
@@ -48,7 +48,7 @@ where
         let user_agent = req
             .headers()
             .get("User-Agent")
-            .map(|h| h.to_str().unwrap_or(""))
+            .and_then(|h| h.to_str().ok())
             .unwrap_or("");
         
         let span = tracing::info_span!(
@@ -66,20 +66,9 @@ where
         );
 
         // Propagate OpenTelemetry parent span context information
-        let mut context = global::get_text_map_propagator(|propagator| {
+        let context = global::get_text_map_propagator(|propagator| {
             propagator.extract(&HeaderMapExtractor::from(req.headers()))
         });
-
-        let span_ref = context.span();
-        let span_context = span_ref.span_context();
-        println!("Span Context: {:?}-{:?}", span_context.trace_id(), span_context.span_id());
-        context = context.with_remote_span_context(SpanContext::new(
-            span_context.trace_id(),
-            span_context.span_id(),
-            span_context.trace_flags().with_sampled(true),
-            true,
-            span_context.trace_state().clone(),
-        ));
 
         span.set_parent(context);
 

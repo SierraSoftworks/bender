@@ -1,4 +1,4 @@
-use opentelemetry::{global, sdk::{propagation::TraceContextPropagator, trace::Sampler}};
+use opentelemetry::{global, sdk::propagation::TraceContextPropagator};
 use opentelemetry_otlp::WithExportConfig;
 use sentry::ClientInitGuard;
 use tracing_subscriber::prelude::*;
