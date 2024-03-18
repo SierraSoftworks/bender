@@ -95,10 +95,7 @@ impl Handler<GetQuote> for MemoryStore {
         quote
             .ok_or_else(|| 
                 APIError::new(404, "Not Found", "There are no quotes available right now, please add one and try again.")
-            )
-            .map(|q| {
-                q.clone()
-            })
+            ).cloned()
     }
 }
 

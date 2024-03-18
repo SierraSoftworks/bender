@@ -36,7 +36,8 @@ impl Loader for BlobLoader {
             APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
         })?;
 
-        let blob_client = ClientBuilder::new(account, StorageCredentials::access_key(account, access_key)).blob_client(&self.container, self.path.to_string_lossy().to_string());
+        let creds = StorageCredentials::access_key(account.to_string(), access_key.to_string());
+        let blob_client = ClientBuilder::new(account, creds).blob_client(&self.container, self.path.to_string_lossy().to_string());
 
         debug!("Fetching {}", self.path.display());
         let blob = blob_client

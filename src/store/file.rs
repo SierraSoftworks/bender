@@ -30,18 +30,15 @@ impl Loader for FileLoader {
         let quote_count = fc.len();
         info!("Read {} quotes from file", quote_count);
 
-        match state.send(AddQuotes {
-            quotes: fc.iter().map(|q| q.clone().into()).collect()
-        }.trace()).await? {
-            Ok(_) => {
-                event!(Level::INFO, "Loaded {} quotes into the state store.", quote_count);
-                Ok(())
-            },
-            Err(err) => {
-                error!("Failed to load quotes from {}: {}", self.path.display(), err);
-                Err(err)
-            },
-        }
+        if let Err(err) = state.send(AddQuotes {
+                    quotes: fc.iter().map(|q| q.clone().into()).collect()
+                }.trace()).await? {
+            error!("Failed to load quotes from {}: {}", self.path.display(), err);
+            Err(err)
+        } else {
+                        event!(Level::INFO, "Loaded {} quotes into the state store.", quote_count);
+                        Ok(())
+                    }
     }
 }
 

@@ -1,5 +1,6 @@
-use opentelemetry::{global, sdk::propagation::TraceContextPropagator};
+use opentelemetry::global;
 use opentelemetry_otlp::WithExportConfig;
+use opentelemetry_sdk::propagation::TraceContextPropagator;
 use sentry::ClientInitGuard;
 use tracing_subscriber::prelude::*;
 
@@ -45,15 +46,15 @@ impl Session {
                         .with_endpoint("https://api.honeycomb.io:443")
                         .with_metadata(tracing_metadata),
                 )
-                .with_trace_config(opentelemetry::sdk::trace::config().with_resource(
-                    opentelemetry::sdk::Resource::new(vec![
+                .with_trace_config(opentelemetry_sdk::trace::config().with_resource(
+                    opentelemetry_sdk::Resource::new(vec![
                         opentelemetry::KeyValue::new("service.name", "bender"),
                         opentelemetry::KeyValue::new("service.version", version!("v")),
                         opentelemetry::KeyValue::new("host.os", std::env::consts::OS),
                         opentelemetry::KeyValue::new("host.architecture", std::env::consts::ARCH),
                     ]),
                 ))
-                .install_batch(opentelemetry::runtime::Tokio)
+                .install_batch(opentelemetry_sdk::runtime::Tokio)
                 .unwrap();
 
             global::set_text_map_propagator(TraceContextPropagator::new());
@@ -69,7 +70,7 @@ impl Session {
                             .unwrap_or_default()
                     },
                 ))
-                .with(tracing_opentelemetry::layer().with_exception_field_propagation(true).with_exception_fields(true).with_tracer(tracer))
+                .with(tracing_opentelemetry::layer().with_error_records_to_exceptions(true).with_error_fields_to_exceptions(true).with_tracer(tracer))
                 .init();
         }
         
