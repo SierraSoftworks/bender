@@ -15,6 +15,8 @@ env:
   CARGO_TERM_COLOR: always
   HANDLER_NAME: bender
   IMAGE: sierrasoftworks/bender
+  GH_IMAGE: sierrasoftworks/bender
+  VERSION: dev
 
   STAGING_DEPLOYMENT_APP_ID: 65d7542d-354d-4129-898c-8848be8d5ecd
   STAGING_FUNCTION_NAME: bender-sierrasoftworks-staging
@@ -44,10 +46,18 @@ jobs:
           echo "${{ secrets.DOCKER_HUB }}" | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
           
       - name: Calculate version number
-        id: version
         if: github.event_name == 'push'
         run: |
+          IMAGE_ID=$(echo '${{ github.repository }}/${{ github.event.repository.name }}' | tr '[:upper:]' '[:lower:]')
+          echo "GH_IMAGE=$IMAGE_ID" >> $GITHUB_ENV
+
           VERSION=$(git describe --tags 2>/dev/null || git rev-parse --short HEAD)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Calculate version number
+        id: repo
+        run: |
+          IMA=$(git describe --tags 2>/dev/null || git rev-parse --short HEAD)
           echo "::set-output name=version::$VERSION"
 
       - name: Build and push
@@ -56,11 +66,11 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          labels: org.opencontainers.image.authors=SierraSoftworks,org.opencontainers.image.version=${{ steps.version.outputs.version }},org.opencontainers.image.revision=${{ github.sha }}
-          tags: ${{ env.IMAGE }}:latest,${{ env.IMAGE }}:${{ steps.version.outputs.version }},docker.pkg.github.com/${{ github.repository }}/${{ github.event.repository.name }}:latest,docker.pkg.github.com/${{ github.repository }}/${{ github.event.repository.name }}:${{ steps.version.outputs.version }}
+          labels: org.opencontainers.image.authors=SierraSoftworks,org.opencontainers.image.version=${{ env.VERSION }},org.opencontainers.image.revision=${{ github.sha }}
+          tags: ${{ env.IMAGE }}:latest,${{ env.IMAGE }}:${{ env.VERSION }},docker.pkg.github.com/${{ env.GH_IMAGE }}:latest,docker.pkg.github.com/${{ env.GH_IMAGE }}:${{ env.VERSION }}
 
       - run: |
-          docker run --rm -t -v $PWD:/volume ${{ env.IMAGE }}:${{ steps.version.outputs.version }} cp /app/$HANDLER_NAME /volume/handler
+          docker run --rm -t -v $PWD:/volume ${{ env.IMAGE }}:${{ env.VERSION }} cp /app/$HANDLER_NAME /volume/handler
           mv ./handler ./$HANDLER_NAME
         
       - name: Save handler artifact
