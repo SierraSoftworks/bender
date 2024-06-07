@@ -26,13 +26,13 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Build Dockerfile
-        run: docker build . --file Dockerfile --tag image
+        run: docker build . --file Dockerfile --tag image --platform linux/amd64,linux/arm64
 
       - run: |
           docker run --rm -t -v $PWD:/volume image cp /app/$HANDLER_NAME /volume/handler
