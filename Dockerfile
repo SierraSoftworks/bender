@@ -1,6 +1,6 @@
 FROM clux/muslrust:stable as builder
 
-RUN apt-get update && apt-get install -y openssl unzip protobuf-compiler
+RUN apt-get update && apt-get install -y openssl unzip protobuf-compiler gcc
 
 WORKDIR /src
 
