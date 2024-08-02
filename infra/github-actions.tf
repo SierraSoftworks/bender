@@ -8,7 +8,7 @@ resource "azuread_application" "deploy-production" {
 }
 
 resource "azuread_service_principal" "deploy-production" {
-  application_id               = azuread_application.deploy-production.application_id
+  client_id                    = azuread_application.deploy-production.client_id
   app_role_assignment_required = false
   owners = [
     data.azuread_client_config.current.object_id,
@@ -22,7 +22,7 @@ resource "azuread_application" "deploy-staging" {
 }
 
 resource "azuread_service_principal" "deploy-staging" {
-  application_id               = azuread_application.deploy-staging.application_id
+  client_id                    = azuread_application.deploy-staging.client_id
   app_role_assignment_required = false
   owners = [
     data.azuread_client_config.current.object_id,
@@ -30,30 +30,30 @@ resource "azuread_service_principal" "deploy-staging" {
 }
 
 resource "azuread_application_federated_identity_credential" "production" {
-  application_object_id = azuread_application.deploy-production.object_id
-  display_name          = "Environment"
-  description           = "Allows deployments from GitHub Actions to the 'Production' environment."
-  audiences             = ["api://AzureADTokenExchange"]
-  issuer                = "https://token.actions.githubusercontent.com"
-  subject               = "repo:${var.repository}:environment:${var.production-environment}"
+  application_id = azuread_application.deploy-production.object_id
+  display_name   = "Environment"
+  description    = "Allows deployments from GitHub Actions to the 'Production' environment."
+  audiences      = ["api://AzureADTokenExchange"]
+  issuer         = "https://token.actions.githubusercontent.com"
+  subject        = "repo:${var.repository}:environment:${var.production-environment}"
 }
 
 resource "azuread_application_federated_identity_credential" "staging" {
-  application_object_id = azuread_application.deploy-staging.object_id
-  display_name          = "Environment"
-  description           = "Allows deployments from GitHub Actions to the 'Staging' environment."
-  audiences             = ["api://AzureADTokenExchange"]
-  issuer                = "https://token.actions.githubusercontent.com"
-  subject               = "repo:${var.repository}:environment:${var.staging-environment}"
+  application_id = azuread_application.deploy-staging.object_id
+  display_name   = "Environment"
+  description    = "Allows deployments from GitHub Actions to the 'Staging' environment."
+  audiences      = ["api://AzureADTokenExchange"]
+  issuer         = "https://token.actions.githubusercontent.com"
+  subject        = "repo:${var.repository}:environment:${var.staging-environment}"
 }
 
 resource "azuread_application_federated_identity_credential" "prs" {
-  application_object_id = azuread_application.deploy-staging.object_id
-  display_name          = "PRs"
-  description           = "Allows deployments from GitHub Actions for pull requests."
-  audiences             = ["api://AzureADTokenExchange"]
-  issuer                = "https://token.actions.githubusercontent.com"
-  subject               = "repo:${var.repository}:pull_request"
+  application_id = azuread_application.deploy-staging.object_id
+  display_name   = "PRs"
+  description    = "Allows deployments from GitHub Actions for pull requests."
+  audiences      = ["api://AzureADTokenExchange"]
+  issuer         = "https://token.actions.githubusercontent.com"
+  subject        = "repo:${var.repository}:pull_request"
 }
 
 resource "azurerm_role_assignment" "deploy-production" {
@@ -72,7 +72,7 @@ output "deploy-production" {
   value = {
     tenant_id       = data.azuread_client_config.current.tenant_id
     subscription_id = data.azurerm_subscription.current.subscription_id
-    client_id       = azuread_application.deploy-production.application_id
+    client_id       = azuread_application.deploy-production.client_id
   }
 }
 
@@ -80,6 +80,6 @@ output "deploy-staging" {
   value = {
     tenant_id       = data.azuread_client_config.current.tenant_id
     subscription_id = data.azurerm_subscription.current.subscription_id
-    client_id       = azuread_application.deploy-staging.application_id
+    client_id       = azuread_application.deploy-staging.client_id
   }
 }
