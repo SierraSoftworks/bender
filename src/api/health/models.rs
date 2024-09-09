@@ -1,4 +1,5 @@
 use crate::{json_responder, models::*};
+use tracing_batteries::prelude::*;
 
 #[derive(Serialize, Deserialize)]
 pub struct HealthV1 {

@@ -3,10 +3,7 @@ mod models;
 mod test;
 
 use actix_web::{get, web, HttpRequest};
-use opentelemetry::trace::TraceContextExt;
-use tracing::Span;
-use tracing::instrument;
-use tracing_opentelemetry::OpenTelemetrySpanExt;
+use tracing_batteries::prelude::*;
 use crate::telemetry::*;
 
 use crate::models::*;
@@ -19,19 +16,19 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
         .service(tracing_v1);
 }
 
-#[instrument(err, skip(state), fields(otel.kind = "internal"))]
+#[tracing::instrument(err, skip(state), fields(otel.kind = "internal"))]
 #[get("/api/v1/health")]
 pub async fn health_v1(state: web::Data<GlobalState>) -> Result<models::HealthV1, APIError> {
     state.store.send(GetHealth {}.trace()).await?.map(|h| h.into())
 }
 
-#[instrument(err, skip(state), fields(otel.kind = "internal"))]
+#[tracing::instrument(err, skip(state), fields(otel.kind = "internal"))]
 #[get("/api/v2/health")]
 pub async fn health_v2(state: web::Data<GlobalState>) -> Result<models::HealthV2, APIError> {
     state.store.send(GetHealth {}.trace()).await?.map(|h| h.into())
 }
 
-#[instrument(err, skip(req), fields(otel.kind = "internal"))]
+#[tracing::instrument(err, skip(req), fields(otel.kind = "internal"))]
 #[get("/api/v1/tracing")]
 pub async fn tracing_v1(req: HttpRequest) -> Result<String, APIError> {
     let headers = req.headers().iter().map(|(k, v)| {

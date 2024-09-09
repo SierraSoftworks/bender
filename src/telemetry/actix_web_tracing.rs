@@ -4,9 +4,8 @@ use actix_web::{Error, http::header::HeaderMap};
 use actix_service::*;
 use actix_web::dev::*;
 use futures::{Future, future::{ok, Ready}, FutureExt};
-use opentelemetry::{propagation::Extractor, global};
-use tracing::{Instrument, Span, field::display};
-use tracing_opentelemetry::OpenTelemetrySpanExt;
+use opentelemetry::propagation::Extractor;
+use tracing_batteries::prelude::*;
 
 pub struct TracingLogger;
 
@@ -51,7 +50,7 @@ where
             .and_then(|h| h.to_str().ok())
             .unwrap_or("");
         
-        let span = tracing::info_span!(
+        let span = info_span!(
             "request",
             "otel.kind" = "server",
             "otel.name" = req.match_pattern().unwrap_or_else(|| req.uri().path().to_string()),
@@ -59,14 +58,14 @@ where
             "net.peer.ip" = %req.connection_info().realip_remote_addr().unwrap_or(""),
             "http.target" = %req.uri(),
             "http.user_agent" = %user_agent,
-            "http.status_code" = tracing::field::Empty,
+            "http.status_code" = EmptyField,
             "http.method" = %req.method(),
             "http.url" = %req.match_pattern().unwrap_or_else(|| req.path().into()),
             "http.headers" = %req.headers().iter().map(|(k, v)| format!("{k}: {v:?}")).collect::<Vec<_>>().join("\n"),
         );
 
         // Propagate OpenTelemetry parent span context information
-        let context = global::get_text_map_propagator(|propagator| {
+        let context = opentelemetry::global::get_text_map_propagator(|propagator| {
             propagator.extract(&HeaderMapExtractor::from(req.headers()))
         });
 

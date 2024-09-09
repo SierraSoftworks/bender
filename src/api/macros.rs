@@ -5,7 +5,7 @@ macro_rules! json_responder {
         impl actix_web::Responder for $t {
             type Body = actix_web::body::BoxBody;
 
-            #[instrument(target="response.render", fields(http.content_type = "application/json"), skip(self, _req))]
+            #[tracing::instrument(target="response.render", fields(http.content_type = "application/json"), skip(self, _req))]
             fn respond_to(self, _req: &actix_web::HttpRequest) -> actix_web::HttpResponse<Self::Body> {
                     actix_web::HttpResponse::Ok()
                     .content_type("application/json")

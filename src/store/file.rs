@@ -1,5 +1,5 @@
 use actix::prelude::*;
-use tracing::*;
+use tracing_batteries::prelude::*;
 use super::{Loader, Store};
 use crate::{api::APIError, models::*};
 use crate::telemetry::*;
@@ -11,7 +11,7 @@ pub struct FileLoader {
 
 #[async_trait::async_trait]
 impl Loader for FileLoader {
-    #[instrument(err, skip(self, state), fields(otel.kind = "internal"))]
+    #[tracing::instrument(err, skip(self, state), fields(otel.kind = "internal"))]
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), APIError> {
         info!("Loading quotes from {}", self.path.display());
 
@@ -36,7 +36,7 @@ impl Loader for FileLoader {
             error!("Failed to load quotes from {}: {}", self.path.display(), err);
             Err(err)
         } else {
-                        event!(Level::INFO, "Loaded {} quotes into the state store.", quote_count);
+                        info!("Loaded {} quotes into the state store.", quote_count);
                         Ok(())
                     }
     }

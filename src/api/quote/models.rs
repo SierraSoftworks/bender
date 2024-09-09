@@ -1,7 +1,7 @@
 use crate::models::Quote;
 
 use actix_web::{HttpRequest, HttpResponse, Responder, http::header, http::header::Header, body::BoxBody};
-use tracing::Span;
+use tracing_batteries::prelude::*;
 
 #[derive(Serialize, Deserialize)]
 pub struct QuoteV1 {
@@ -30,7 +30,7 @@ impl From<Quote> for QuoteV1 {
 impl Responder for QuoteV1 {
     type Body = BoxBody;
     
-    #[instrument(target="response.render", fields(http.content_type = tracing::field::Empty), skip(self, req))]
+    #[tracing::instrument(target="response.render", fields(http.content_type = tracing::field::Empty), skip(self, req))]
     fn respond_to(self, req: &HttpRequest) -> HttpResponse<Self::Body> {
         let content_type = header::Accept::parse(req).map(|header| {
             for a in header.iter() {
@@ -46,7 +46,7 @@ impl Responder for QuoteV1 {
             "application/json"
         }).unwrap_or("application/json");
 
-        Span::current().record("http.content_type", &tracing::field::display(content_type));
+        Span::current().record("http.content_type", display(content_type));
 
         info!({ http.content_type = %content_type}, "Rendering quote");
 

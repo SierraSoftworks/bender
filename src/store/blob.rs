@@ -1,8 +1,7 @@
 use actix::prelude::*;
 use azure_storage::{ConnectionString, StorageCredentials};
 use azure_storage_blobs::prelude::*;
-use tracing::*;
-use tracing_futures::Instrument;
+use tracing_batteries::prelude::*;
 use super::{Loader, Store};
 use crate::{api::APIError, models::*};
 use crate::telemetry::*;
@@ -16,7 +15,7 @@ pub struct BlobLoader {
 
 #[async_trait::async_trait]
 impl Loader for BlobLoader {
-    #[instrument(err, skip(self, state), fields(otel.kind = "internal"))]
+    #[tracing::instrument(err, skip(self, state), fields(otel.kind = "internal"))]
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), APIError> {
         debug!("Initializing Azure Blob storage client");
 
@@ -62,7 +61,7 @@ impl Loader for BlobLoader {
             quotes: fc.iter().map(|q| q.clone().into()).collect()
         }.trace()).await? {
             Ok(_) => {
-                event!(Level::INFO, "Loaded {} quotes into the state store.", quote_count);
+                info!("Loaded {} quotes into the state store.", quote_count);
                 Ok(())
             },
             Err(err) => {

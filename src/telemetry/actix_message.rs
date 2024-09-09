@@ -1,5 +1,5 @@
 use actix::Message;
-use tracing::Span;
+use tracing_batteries::prelude::*;
 
 pub struct TraceMessage<M: Message> {
     pub message: M,
