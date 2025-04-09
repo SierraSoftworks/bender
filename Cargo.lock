@@ -355,6 +355,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fec134f64e2bc57411226dfc4e52dec859ddfc7e711fc5e07b612584f000e4aa"
 dependencies = [
  "brotli 6.0.0",
+ "flate2",
  "futures-core",
  "memchr",
  "pin-project-lite",
@@ -505,16 +506,14 @@ dependencies = [
 
 [[package]]
 name = "azure_core"
-version = "0.22.0"
+version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c749d6035e8835014fa4897173792d772f0a65fac32e57c3cd9d676c8114e8a"
+checksum = "b0435fd24f90b870a2b5010a0431ba69b316b6cdf880ae1cf7701671b465ddca"
 dependencies = [
  "async-lock",
  "async-trait",
  "bytes",
  "futures",
- "once_cell",
- "paste",
  "pin-project",
  "rustc_version",
  "serde",
@@ -616,7 +615,7 @@ dependencies = [
  "actix-service",
  "actix-web",
  "async-trait",
- "azure_core 0.22.0",
+ "azure_core 0.23.0",
  "azure_storage",
  "azure_storage_blobs",
  "chrono",
@@ -3252,21 +3251,21 @@ checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 
 [[package]]
 name = "typespec"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f39c392e9cb463e8f1f9b86d2d5934ef391ee83724095e7f813aa0202e4e8d3b"
+checksum = "859b9d83198115b1db96c1bad5c53b684bdaae7cc8bb00a03f2e03549fe59ad5"
 dependencies = [
  "base64 0.22.1",
- "http-types",
+ "serde",
  "serde_json",
  "url",
 ]
 
 [[package]]
 name = "typespec_client_core"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0839582d301a1ba457905b6940f10879ff16b43b98ff66477cb4a44cbea81a92"
+checksum = "a2da9e6e81b951c2b53f0ea513b441f39a43d740190f05a80f4a3fcc5ed7596e"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -3274,9 +3273,9 @@ dependencies = [
  "dyn-clone",
  "futures",
  "getrandom 0.2.15",
- "http-types",
  "pin-project",
  "rand 0.8.5",
+ "reqwest",
  "serde",
  "serde_json",
  "time",

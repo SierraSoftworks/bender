@@ -12,7 +12,7 @@ actix-rt = "2.10"
 actix-service = "2.0.3"
 actix-web = "4.10"
 async-trait = "0.1.88"
-azure_core = "0.22"
+azure_core = "0.23"
 azure_storage_blobs = "0.21"
 azure_storage = "0.21"
 chrono = { version = "0.4", features = ["serde"] }
