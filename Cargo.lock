@@ -506,9 +506,9 @@ dependencies = [
 
 [[package]]
 name = "azure_core"
-version = "0.24.0"
+version = "0.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f5e6bcc9dfd4587f3132818b6922b9157f00a4df7fd7bf76395ddf37f58983d"
+checksum = "82c33c072c9d87777262f35abfe2a64b609437076551d4dac8373e60f0e3fde9"
 dependencies = [
  "async-lock",
  "async-trait",
@@ -615,7 +615,7 @@ dependencies = [
  "actix-service",
  "actix-web",
  "async-trait",
- "azure_core 0.24.0",
+ "azure_core 0.25.0",
  "azure_storage",
  "azure_storage_blobs",
  "chrono",
@@ -3455,9 +3455,9 @@ checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
 
 [[package]]
 name = "typespec"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c2cb5cb7292822e6d81f385ce512e0a5936a8c93cb194d2ff41477dfd8d1e21f"
+checksum = "04c7a952f1f34257f945fc727b20defe7a3c01c05ddd42925977626cfa6e62ab"
 dependencies = [
  "base64 0.22.1",
  "serde",
@@ -3467,9 +3467,9 @@ dependencies = [
 
 [[package]]
 name = "typespec_client_core"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1a543a33b2bd2b918a6f487522d4df324c194cc3e9ea89871a202dd237713a61"
+checksum = "5879ce67ba9e525fe088c882ede1337c32c3f80e83e72d9fd3cc6c8e05bcb3d7"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -3486,8 +3486,21 @@ dependencies = [
  "tokio",
  "tracing",
  "typespec",
+ "typespec_macros",
  "url",
  "uuid 1.10.0",
+]
+
+[[package]]
+name = "typespec_macros"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6cbccdbe531c8d553812a609bdb70c0d1002ad91333498e18df42c98744b15cc"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "rustc_version",
+ "syn",
 ]
 
 [[package]]
