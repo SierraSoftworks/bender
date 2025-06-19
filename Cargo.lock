@@ -632,7 +632,7 @@ dependencies = [
  "mime",
  "rand 0.8.5",
  "reqwest",
- "sentry 0.40.0",
+ "sentry",
  "serde",
  "serde_json",
  "tokio",
@@ -1459,7 +1459,7 @@ dependencies = [
  "tokio",
  "tokio-rustls",
  "tower-service",
- "webpki-roots 0.26.5",
+ "webpki-roots 0.26.11",
 ]
 
 [[package]]
@@ -2619,9 +2619,9 @@ dependencies = [
 
 [[package]]
 name = "rustls"
-version = "0.23.19"
+version = "0.23.28"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "934b404430bb06b3fae2cba809eb45a1ab1aecd64491213d7c3301b88393f8d1"
+checksum = "7160e3e10bf4535308537f3c4e1641468cd0e485175d6163087c0393c7d46643"
 dependencies = [
  "log",
  "once_cell",
@@ -2666,9 +2666,9 @@ dependencies = [
 
 [[package]]
 name = "rustls-webpki"
-version = "0.102.8"
+version = "0.103.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64ca1bc8749bd4cf37b5ce386cc146580777b4e8572c7b97baf22c83f444bee9"
+checksum = "e4a72fe2bcf7a6ac6fd7d0b9e5cb68aeb7d4c0a0271730218b3e92d43b4eb435"
 dependencies = [
  "ring",
  "rustls-pki-types",
@@ -2733,23 +2733,6 @@ checksum = "61697e0a1c7e512e84a621326239844a24d8207b4669b41bc18b32ea5cbf988b"
 
 [[package]]
 name = "sentry"
-version = "0.39.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0eb7daabbc631b13f48e991f4d828f12ec43e2acd3fb2972b445bdc138231ee2"
-dependencies = [
- "httpdate",
- "reqwest",
- "rustls",
- "sentry-actix 0.39.0",
- "sentry-core 0.39.0",
- "sentry-log",
- "tokio",
- "ureq 2.10.1",
- "webpki-roots 0.26.5",
-]
-
-[[package]]
-name = "sentry"
 version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "69ccd7644577f876e92e7873d505ad35c30fc4fcf1654d4885c74605c95d0a07"
@@ -2757,28 +2740,17 @@ dependencies = [
  "httpdate",
  "native-tls",
  "reqwest",
- "sentry-actix 0.40.0",
+ "rustls",
+ "sentry-actix",
  "sentry-backtrace",
  "sentry-contexts",
- "sentry-core 0.40.0",
+ "sentry-core",
  "sentry-debug-images",
+ "sentry-log",
  "sentry-panic",
  "sentry-tracing",
  "tokio",
- "ureq 3.0.12",
-]
-
-[[package]]
-name = "sentry-actix"
-version = "0.39.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1adf30c8878b392fa48e6a922ccbd5e6f10333f246d81b838750a9ac8f249b0"
-dependencies = [
- "actix-http",
- "actix-web",
- "bytes",
- "futures-util",
- "sentry-core 0.39.0",
+ "ureq",
 ]
 
 [[package]]
@@ -2791,7 +2763,7 @@ dependencies = [
  "actix-web",
  "bytes",
  "futures-util",
- "sentry-core 0.40.0",
+ "sentry-core",
 ]
 
 [[package]]
@@ -2802,7 +2774,7 @@ checksum = "cd11d45dfae763b628d5dc45872ade9dc7b1e6894e3d3787ee8d95bf426afe12"
 dependencies = [
  "backtrace",
  "regex",
- "sentry-core 0.40.0",
+ "sentry-core",
 ]
 
 [[package]]
@@ -2815,20 +2787,8 @@ dependencies = [
  "libc",
  "os_info",
  "rustc_version",
- "sentry-core 0.40.0",
+ "sentry-core",
  "uname",
-]
-
-[[package]]
-name = "sentry-core"
-version = "0.39.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e73bfcabac5a7f9e2e38f898ba0afc6bed36fb96108b246213b698e00f12268c"
-dependencies = [
- "rand 0.9.0",
- "sentry-types 0.39.0",
- "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -2838,7 +2798,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "36e9d6c4dbf4db62c8aa6f9808ce16447ac265221c8620f78e63c159256c5f85"
 dependencies = [
  "rand 0.9.0",
- "sentry-types 0.40.0",
+ "sentry-types",
  "serde",
  "serde_json",
 ]
@@ -2850,17 +2810,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "44914f42e18b368eb6a87e5334cf315a86997e1dfdacf284fe9d32002453d3a8"
 dependencies = [
  "findshlibs",
- "sentry-core 0.40.0",
+ "sentry-core",
 ]
 
 [[package]]
 name = "sentry-log"
-version = "0.39.0"
+version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8d6ce7212ad4acfbffcc0611c216420e40050a9a5cb05ebbd0e4093ef276d86"
+checksum = "14706e5944cea4e5d07283fc97d3d5535d27de44a1e3c06cb77e2f146d37663e"
 dependencies = [
  "log",
- "sentry-core 0.39.0",
+ "sentry-core",
 ]
 
 [[package]]
@@ -2870,7 +2830,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f87e3fc5a8ba378c259f93f050a1f44143619daa3402f51eadacc08002160110"
 dependencies = [
  "sentry-backtrace",
- "sentry-core 0.40.0",
+ "sentry-core",
 ]
 
 [[package]]
@@ -2880,26 +2840,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "532c5f7a9b633e6f2bf6623223cede95b112a7f104141a8cf050003417fc4d54"
 dependencies = [
  "sentry-backtrace",
- "sentry-core 0.40.0",
+ "sentry-core",
  "tracing-core",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "sentry-types"
-version = "0.39.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7205055c5bde8131c62e4f5367f4291956c331a64e1a32e737e8d81b26b3bcb"
-dependencies = [
- "debugid",
- "hex",
- "rand 0.9.0",
- "serde",
- "serde_json",
- "thiserror 2.0.12",
- "time",
- "url",
- "uuid 1.10.0",
 ]
 
 [[package]]
@@ -3443,13 +3386,13 @@ dependencies = [
 [[package]]
 name = "tracing-batteries"
 version = "0.1.0"
-source = "git+https://github.com/sierrasoftworks/tracing-batteries-rs.git#d5ddd3e2ab49ec01088a691d872795171ffecebb"
+source = "git+https://github.com/sierrasoftworks/tracing-batteries-rs.git#86ba74f31a01989f991faf57d421e3cc03b127a8"
 dependencies = [
  "opentelemetry",
  "opentelemetry-otlp",
  "opentelemetry_sdk",
  "reqwest",
- "sentry 0.39.0",
+ "sentry",
  "tonic",
  "tracing",
  "tracing-attributes 0.2.0",
@@ -3614,21 +3557,6 @@ checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 
 [[package]]
 name = "ureq"
-version = "2.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b74fc6b57825be3373f7054754755f03ac3a8f5d70015ccad699ba2029956f4a"
-dependencies = [
- "base64 0.22.1",
- "log",
- "once_cell",
- "rustls",
- "rustls-pki-types",
- "url",
- "webpki-roots 0.26.5",
-]
-
-[[package]]
-name = "ureq"
 version = "3.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f0fde9bc91026e381155f8c67cb354bcd35260b2f4a29bcc84639f762760c39"
@@ -3638,11 +3566,13 @@ dependencies = [
  "log",
  "native-tls",
  "percent-encoding",
+ "rustls",
  "rustls-pemfile",
  "rustls-pki-types",
  "ureq-proto",
  "utf-8",
  "webpki-root-certs 0.26.11",
+ "webpki-roots 0.26.11",
 ]
 
 [[package]]
@@ -3885,11 +3815,11 @@ dependencies = [
 
 [[package]]
 name = "webpki-roots"
-version = "0.26.5"
+version = "0.26.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0bd24728e5af82c6c4ec1b66ac4844bdf8156257fccda846ec58b42cd0cdbe6a"
+checksum = "521bc38abb08001b01866da9f51eb7c5d647a19260e00054a8c7fd5f9e57f7a9"
 dependencies = [
- "rustls-pki-types",
+ "webpki-roots 1.0.0",
 ]
 
 [[package]]
