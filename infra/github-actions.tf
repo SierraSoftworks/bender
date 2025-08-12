@@ -30,7 +30,7 @@ resource "azuread_service_principal" "deploy-staging" {
 }
 
 resource "azuread_application_federated_identity_credential" "production" {
-  application_id = azuread_application.deploy-production.object_id
+  application_id = azuread_application.deploy-production.id
   display_name   = "Environment"
   description    = "Allows deployments from GitHub Actions to the 'Production' environment."
   audiences      = ["api://AzureADTokenExchange"]
@@ -39,7 +39,7 @@ resource "azuread_application_federated_identity_credential" "production" {
 }
 
 resource "azuread_application_federated_identity_credential" "staging" {
-  application_id = azuread_application.deploy-staging.object_id
+  application_id = azuread_application.deploy-staging.id
   display_name   = "Environment"
   description    = "Allows deployments from GitHub Actions to the 'Staging' environment."
   audiences      = ["api://AzureADTokenExchange"]
@@ -48,7 +48,7 @@ resource "azuread_application_federated_identity_credential" "staging" {
 }
 
 resource "azuread_application_federated_identity_credential" "prs" {
-  application_id = azuread_application.deploy-staging.object_id
+  application_id = azuread_application.deploy-staging.id
   display_name   = "PRs"
   description    = "Allows deployments from GitHub Actions for pull requests."
   audiences      = ["api://AzureADTokenExchange"]
