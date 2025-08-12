@@ -1,6 +1,7 @@
 {
     "version": "2.0",
-    "logging": {},
+    "logging": {
+    },
     "extensionBundle": {
         "id": "Microsoft.Azure.Functions.ExtensionBundle",
         "version": "[4.*, 5.0.0)"
@@ -13,10 +14,9 @@
     "customHandler": {
         "enableForwardingHttpRequest": true,
         "description": {
-            "defaultExecutablePath": "bender",
-            "workingDirectory": "",
-            "arguments": []
+            "defaultExecutablePath": "bender"
         }
     },
-    "functionTimeout": "00:00:02"
+    "telemetryMode": "OpenTelemetry",
+    "functionTimeout": "00:00:10"
 }
