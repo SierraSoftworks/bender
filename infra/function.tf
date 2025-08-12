@@ -12,12 +12,13 @@ data "azurerm_linux_function_app" "production" {
 }
 
 resource "azurerm_linux_function_app" "production" {
-  name                       = "${var.name}-sierrasoftworks"
-  location                   = azurerm_resource_group.function.location
-  resource_group_name        = azurerm_resource_group.function.name
-  service_plan_id            = azurerm_service_plan.function.id
-  storage_account_name       = azurerm_storage_account.function.name
-  storage_account_access_key = azurerm_storage_account.function.primary_access_key
+  name                          = "${var.name}-sierrasoftworks"
+  location                      = azurerm_resource_group.function.location
+  resource_group_name           = azurerm_resource_group.function.name
+  service_plan_id               = azurerm_service_plan.function.id
+  storage_account_name          = azurerm_storage_account.function.name
+  storage_uses_managed_identity = true
+  storage_account_access_key    = azurerm_storage_account.function.primary_access_key
 
   https_only = true
 
@@ -82,12 +83,13 @@ data "azurerm_linux_function_app" "staging" {
 }
 
 resource "azurerm_linux_function_app" "staging" {
-  name                       = "${var.name}-sierrasoftworks-staging"
-  location                   = azurerm_resource_group.function.location
-  resource_group_name        = azurerm_resource_group.function.name
-  service_plan_id            = azurerm_service_plan.function.id
-  storage_account_name       = azurerm_storage_account.function.name
-  storage_account_access_key = azurerm_storage_account.function.primary_access_key
+  name                          = "${var.name}-sierrasoftworks-staging"
+  location                      = azurerm_resource_group.function.location
+  resource_group_name           = azurerm_resource_group.function.name
+  service_plan_id               = azurerm_service_plan.function.id
+  storage_account_name          = azurerm_storage_account.function.name
+  storage_account_access_key    = azurerm_storage_account.function.primary_access_key
+  storage_uses_managed_identity = true
 
   https_only = true
 
