@@ -14,7 +14,7 @@
     "customHandler": {
         "enableForwardingHttpRequest": true,
         "description": {
-            "defaultExecutablePath": "bender-linux-amd64"
+            "defaultExecutablePath": "bender"
         }
     },
     "telemetryMode": "OpenTelemetry",
