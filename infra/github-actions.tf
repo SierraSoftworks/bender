@@ -68,6 +68,32 @@ resource "azurerm_role_assignment" "deploy-staging" {
   role_definition_name = "Contributor"
 }
 
+# Storage account access for GitHub Actions deployment - Production
+resource "azurerm_role_assignment" "deploy-production-storage-blob-data-contributor" {
+  scope                = azurerm_storage_account.function.id
+  principal_id         = azuread_service_principal.deploy-production.object_id
+  role_definition_name = "Storage Blob Data Contributor"
+}
+
+resource "azurerm_role_assignment" "deploy-production-storage-account-contributor" {
+  scope                = azurerm_storage_account.function.id
+  principal_id         = azuread_service_principal.deploy-production.object_id
+  role_definition_name = "Storage Account Contributor"
+}
+
+# Storage account access for GitHub Actions deployment - Staging
+resource "azurerm_role_assignment" "deploy-staging-storage-blob-data-contributor" {
+  scope                = azurerm_storage_account.function.id
+  principal_id         = azuread_service_principal.deploy-staging.object_id
+  role_definition_name = "Storage Blob Data Contributor"
+}
+
+resource "azurerm_role_assignment" "deploy-staging-storage-account-contributor" {
+  scope                = azurerm_storage_account.function.id
+  principal_id         = azuread_service_principal.deploy-staging.object_id
+  role_definition_name = "Storage Account Contributor"
+}
+
 output "deploy-production" {
   value = {
     tenant_id       = data.azuread_client_config.current.tenant_id
