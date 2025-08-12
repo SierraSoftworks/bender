@@ -186,15 +186,15 @@ jobs:
         uses: SierraSoftworks/gh-releases@v1.0.7
         if: github.event_name == 'release'
         with:
-          files: "target/${{ matrix.target }}/release/${{ github.repository }}${{ matrix.extension }} | ${{ github.repository }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.extension }}"
+          files: "target/${{ matrix.target }}/release/${{ github.event.repository.name }}${{ matrix.extension }} | ${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.extension }}"
           token: ${{ secrets.GITHUB_TOKEN }}
           overwrite: "true"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.repository }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.extension }}
-          path: target/${{ matrix.target }}/release/${{ github.repository }}${{ matrix.extension }}
+          name: ${{ github.event.repository.name }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.extension }}
+          path: target/${{ matrix.target }}/release/${{ github.event.repository.name }}${{ matrix.extension }}
 
   docker-build:
     name: Docker Build
@@ -251,11 +251,11 @@ jobs:
       - name: Pull in platform artifact
         uses: actions/download-artifact@v5
         with:
-          name: ${{ github.repository }}-${{ env.PLATFORM_PAIR }}
+          name: ${{ github.event.repository.name }}-${{ env.PLATFORM_PAIR }}
 
       - name: mark artifact as executable
         run: |
-          chmod +x ${{ github.repository }}
+          chmod +x ${{ github.event.repository.name }}
 
       - name: Build and push by digest
         id: build
@@ -348,7 +348,7 @@ jobs:
       - name: Fetch handler artifact
         uses: actions/download-artifact@v5
         with:
-          name: ${{ github.repository }}-linux-amd64
+          name: ${{ github.event.repository.name }}-linux-amd64
       
       - name: 'Login via Azure CLI'
         uses: Azure/login@v2
@@ -391,7 +391,7 @@ jobs:
       - name: Fetch handler artifact
         uses: actions/download-artifact@v5
         with:
-          name: ${{ github.repository }}-linux-amd64
+          name: ${{ github.event.repository.name }}-linux-amd64
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v2
