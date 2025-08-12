@@ -13,7 +13,6 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  HANDLER_NAME: bender
   VERSION: "0.0.0-dev"
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -187,15 +186,15 @@ jobs:
         uses: SierraSoftworks/gh-releases@v1.0.7
         if: github.event_name == 'release'
         with:
-          files: "target/${{ matrix.target }}/release/${{ env.HANDLER_NAME }}${{ matrix.extension }} | ${{ env.HANDLER_NAME }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.extension }}"
+          files: "target/${{ matrix.target }}/release/${{ github.repository }}${{ matrix.extension }} | ${{ github.repository }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.extension }}"
           token: ${{ secrets.GITHUB_TOKEN }}
           overwrite: "true"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.HANDLER_NAME }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.extension }}
-          path: target/${{ matrix.target }}/release/${{ env.HANDLER_NAME }}${{ matrix.extension }}
+          name: ${{ github.repository }}-${{ matrix.os }}-${{ matrix.arch }}${{ matrix.extension }}
+          path: target/${{ matrix.target }}/release/${{ github.repository }}${{ matrix.extension }}
 
   docker-build:
     name: Docker Build
@@ -252,11 +251,11 @@ jobs:
       - name: Pull in platform artifact
         uses: actions/download-artifact@v5
         with:
-          name: ${{ env.HANDLER_NAME }}-${{ env.PLATFORM_PAIR }}
+          name: ${{ github.repository }}-${{ env.PLATFORM_PAIR }}
 
       - name: mark artifact as executable
         run: |
-          chmod +x ${{ env.HANDLER_NAME }}
+          chmod +x ${{ github.repository }}
 
       - name: Build and push by digest
         id: build
