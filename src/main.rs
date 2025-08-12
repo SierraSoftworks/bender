@@ -56,12 +56,12 @@ async fn main() -> std::io::Result<()> {
             .wrap(telemetry::TracingLogger)
             .configure(api::configure)
     })
-    .bind(format!("0.0.0.0:{}", listen_on))?
+    .bind(format!("0.0.0.0:{listen_on}"))?
     .run()
     .await;
 
     if let Err(error) = &result {
-        eprintln!("Error starting server: {}", error);
+        eprintln!("Error starting server: {error}");
         session.record_error(error);
     }
 

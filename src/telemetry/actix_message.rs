@@ -14,6 +14,7 @@ pub trait TraceMessageExt {
     type Message: Message + Sized;
 
     fn trace(self) -> TraceMessage<Self::Message>;
+    #[allow(dead_code)]
     fn with_span(self, span: Span) -> TraceMessage<Self::Message>;
 }
 

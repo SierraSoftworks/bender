@@ -7,6 +7,7 @@ use azure_storage_blobs::prelude::*;
 use std::path::PathBuf;
 use tracing_batteries::prelude::*;
 
+#[allow(dead_code)]
 pub struct BlobLoader {
     pub connection_string: String,
     pub container: String,
