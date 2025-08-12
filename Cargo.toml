@@ -30,3 +30,5 @@ tokio = { version = "1.47", features = ["sync"] }
 tonic = { version = "0.12", features = ["tls-roots"] }
 tracing-batteries = { git = "https://github.com/sierrasoftworks/tracing-batteries-rs.git" }
 uuid = { version = "0.7", features = ["serde", "v4", "u128" ]}
+openssl-sys = { version = "0.9.109", features = ["vendored"] }
+tracing = "0.1.41"

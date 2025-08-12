@@ -1,4 +1,3 @@
-mod stateview;
 mod health;
 mod quote;
 
@@ -6,7 +5,6 @@ use actix::prelude::*;
 
 pub use quote::*;
 pub use health::*;
-pub use stateview::*;
 
 #[derive(Clone)]
 pub struct GlobalState {
