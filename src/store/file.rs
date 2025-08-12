@@ -1,9 +1,9 @@
-use actix::prelude::*;
-use tracing_batteries::prelude::*;
 use super::{Loader, Store};
-use crate::{api::APIError, models::*};
 use crate::telemetry::*;
+use crate::{api::APIError, models::*};
+use actix::prelude::*;
 use std::{fs::File, path::PathBuf};
+use tracing_batteries::prelude::*;
 
 pub struct FileLoader {
     pub path: PathBuf,
@@ -22,7 +22,6 @@ impl Loader for FileLoader {
                     APIError::new(503, "Service Unavailable", "We could not load the quotes needed to give you your daily dose of fun, we're so sorry.")
                 })?;
 
-        
         let fc: Vec<FileQuoteV1> = info_span!("read_file").in_scope(|| serde_json::from_reader(f) ).map_err(|err| {
             error!({ exception.message = ?err }, "Unable to parse quotes file.");
             APIError::new(503, "Service Unavailable", "We could not load the quotes needed to give you your daily dose of fun, we're so sorry.")
@@ -30,15 +29,25 @@ impl Loader for FileLoader {
         let quote_count = fc.len();
         info!("Read {} quotes from file", quote_count);
 
-        if let Err(err) = state.send(AddQuotes {
-                    quotes: fc.iter().map(|q| q.clone().into()).collect()
-                }.trace()).await? {
-            error!("Failed to load quotes from {}: {}", self.path.display(), err);
+        if let Err(err) = state
+            .send(
+                AddQuotes {
+                    quotes: fc.iter().map(|q| q.clone().into()).collect(),
+                }
+                .trace(),
+            )
+            .await?
+        {
+            error!(
+                "Failed to load quotes from {}: {}",
+                self.path.display(),
+                err
+            );
             Err(err)
         } else {
-                        info!("Loaded {} quotes into the state store.", quote_count);
-                        Ok(())
-                    }
+            info!("Loaded {} quotes into the state store.", quote_count);
+            Ok(())
+        }
     }
 }
 
@@ -72,23 +81,44 @@ mod tests {
 
     #[actix_rt::test]
     async fn load_quotes() {
-        let loader = FileLoader{
+        let loader = FileLoader {
             path: get_dev_dir().join("quotes.json"),
         };
 
         let state = Store::new().start();
         loader.load_quotes(state.clone()).await.unwrap();
 
-        state.send(GetQuote{who:"".to_string()}).await.expect("the actor should respond").expect("we should get a quote");
-        state.send(GetQuote{who:"Bender".to_string()}).await.expect("the actor should respond").expect("we should get a quote");
-        state.send(GetQuote{who:"bEnDeR".to_string()}).await.expect("the actor should respond").expect("we should get a quote");
+        state
+            .send(GetQuote {
+                who: "".to_string(),
+            })
+            .await
+            .expect("the actor should respond")
+            .expect("we should get a quote");
+        state
+            .send(GetQuote {
+                who: "Bender".to_string(),
+            })
+            .await
+            .expect("the actor should respond")
+            .expect("we should get a quote");
+        state
+            .send(GetQuote {
+                who: "bEnDeR".to_string(),
+            })
+            .await
+            .expect("the actor should respond")
+            .expect("we should get a quote");
     }
 
     fn get_dev_dir() -> PathBuf {
         let file = PathBuf::from(file!()).canonicalize().unwrap();
-        file.parent().unwrap()
-            .parent().unwrap()
-            .parent().unwrap()
+        file.parent()
+            .unwrap()
+            .parent()
+            .unwrap()
+            .parent()
+            .unwrap()
             .to_path_buf()
     }
 }

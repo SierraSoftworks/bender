@@ -1,4 +1,3 @@
-
 #[macro_export]
 macro_rules! json_responder {
     ($t:ty) => {

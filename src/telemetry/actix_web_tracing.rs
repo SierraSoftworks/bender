@@ -1,9 +1,15 @@
-use std::{pin::Pin, task::{Context, Poll}};
+use std::{
+    pin::Pin,
+    task::{Context, Poll},
+};
 
-use actix_web::{Error, http::header::HeaderMap};
 use actix_service::*;
 use actix_web::dev::*;
-use futures::{Future, future::{ok, Ready}, FutureExt};
+use actix_web::{http::header::HeaderMap, Error};
+use futures::{
+    future::{ok, Ready},
+    Future, FutureExt,
+};
 use opentelemetry::propagation::Extractor;
 use tracing_batteries::prelude::*;
 
@@ -11,7 +17,7 @@ pub struct TracingLogger;
 
 impl<S, B> Transform<S, ServiceRequest> for TracingLogger
 where
-    S: Service<ServiceRequest, Response=ServiceResponse<B>, Error=Error>,
+    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
     S::Future: 'static,
 {
     type Response = ServiceResponse<B>;
@@ -32,7 +38,7 @@ pub struct TracingLoggerMiddleware<S> {
 
 impl<S, B> Service<ServiceRequest> for TracingLoggerMiddleware<S>
 where
-    S: Service<ServiceRequest, Response=ServiceResponse<B>, Error=Error>,
+    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
     S::Future: 'static,
 {
     type Response = ServiceResponse<B>;
@@ -49,7 +55,7 @@ where
             .get("User-Agent")
             .and_then(|h| h.to_str().ok())
             .unwrap_or("");
-        
+
         let span = info_span!(
             "request",
             "otel.kind" = "server",
@@ -71,23 +77,31 @@ where
 
         span.set_parent(context);
 
-        let fut = self.service.call(req).map(move |outcome| match &outcome {
-            Ok(response) => {
-                Span::current().record("http.status_code", display(response.response().status()));
-                outcome
-            },
-            Err(error) => {
-                Span::current().record("http.status_code", display(error.as_response_error().status_code()));
-                outcome
-            },
-        }).instrument(span);
-        
+        let fut = self
+            .service
+            .call(req)
+            .map(move |outcome| match &outcome {
+                Ok(response) => {
+                    Span::current()
+                        .record("http.status_code", display(response.response().status()));
+                    outcome
+                }
+                Err(error) => {
+                    Span::current().record(
+                        "http.status_code",
+                        display(error.as_response_error().status_code()),
+                    );
+                    outcome
+                }
+            })
+            .instrument(span);
+
         Box::pin(fut)
     }
 }
 
 struct HeaderMapExtractor<'a> {
-    headers: &'a HeaderMap
+    headers: &'a HeaderMap,
 }
 
 impl<'a> From<&'a HeaderMap> for HeaderMapExtractor<'a> {

@@ -1,11 +1,11 @@
+use super::{Loader, Store};
+use crate::telemetry::*;
+use crate::{api::APIError, models::*};
 use actix::prelude::*;
 use azure_storage::{ConnectionString, StorageCredentials};
 use azure_storage_blobs::prelude::*;
-use tracing_batteries::prelude::*;
-use super::{Loader, Store};
-use crate::{api::APIError, models::*};
-use crate::telemetry::*;
 use std::path::PathBuf;
+use tracing_batteries::prelude::*;
 
 pub struct BlobLoader {
     pub connection_string: String,
@@ -36,7 +36,8 @@ impl Loader for BlobLoader {
         })?;
 
         let creds = StorageCredentials::access_key(account.to_string(), access_key.to_string());
-        let blob_client = ClientBuilder::new(account, creds).blob_client(&self.container, self.path.to_string_lossy().to_string());
+        let blob_client = ClientBuilder::new(account, creds)
+            .blob_client(&self.container, self.path.to_string_lossy().to_string());
 
         debug!("Fetching {}", self.path.display());
         let blob = blob_client
@@ -57,17 +58,27 @@ impl Loader for BlobLoader {
         let quote_count = fc.len();
         info!("Received {} quotes from Azure blob storage", quote_count);
 
-        match state.send(AddQuotes {
-            quotes: fc.iter().map(|q| q.clone().into()).collect()
-        }.trace()).await? {
+        match state
+            .send(
+                AddQuotes {
+                    quotes: fc.iter().map(|q| q.clone().into()).collect(),
+                }
+                .trace(),
+            )
+            .await?
+        {
             Ok(_) => {
                 info!("Loaded {} quotes into the state store.", quote_count);
                 Ok(())
-            },
+            }
             Err(err) => {
-                error!("Failed to load quotes from {}: {}", self.path.display(), err);
+                error!(
+                    "Failed to load quotes from {}: {}",
+                    self.path.display(),
+                    err
+                );
                 Err(err)
-            },
+            }
         }
     }
 }
@@ -112,8 +123,26 @@ mod tests {
         let state = Store::new().start();
         loader.load_quotes(state.clone()).await.unwrap();
 
-        state.send(GetQuote{who:"".to_string()}).await.expect("the actor should respond").expect("we should get a quote");
-        state.send(GetQuote{who:"Bender".to_string()}).await.expect("the actor should respond").expect("we should get a quote");
-        state.send(GetQuote{who:"bEnDeR".to_string()}).await.expect("the actor should respond").expect("we should get a quote");
+        state
+            .send(GetQuote {
+                who: "".to_string(),
+            })
+            .await
+            .expect("the actor should respond")
+            .expect("we should get a quote");
+        state
+            .send(GetQuote {
+                who: "Bender".to_string(),
+            })
+            .await
+            .expect("the actor should respond")
+            .expect("we should get a quote");
+        state
+            .send(GetQuote {
+                who: "bEnDeR".to_string(),
+            })
+            .await
+            .expect("the actor should respond")
+            .expect("we should get a quote");
     }
 }

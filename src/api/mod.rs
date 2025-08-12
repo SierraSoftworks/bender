@@ -1,10 +1,10 @@
-pub mod health;
-pub mod quote;
 pub mod error;
+pub mod health;
 mod macros;
+pub mod quote;
 
-pub use error::APIError;
 pub use crate::models::GlobalState;
+pub use error::APIError;
 
 use actix_web::web;
 

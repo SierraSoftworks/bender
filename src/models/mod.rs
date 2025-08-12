@@ -3,8 +3,8 @@ mod quote;
 
 use actix::prelude::*;
 
-pub use quote::*;
 pub use health::*;
+pub use quote::*;
 
 #[derive(Clone)]
 pub struct GlobalState {

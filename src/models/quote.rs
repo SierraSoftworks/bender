@@ -1,5 +1,5 @@
-use actix::prelude::*;
 use crate::api::APIError;
+use actix::prelude::*;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Quote {
@@ -16,7 +16,6 @@ pub struct AddQuote {
 impl Message for AddQuote {
     type Result = Result<(), APIError>;
 }
-
 
 #[derive(Debug)]
 pub struct AddQuotes {

@@ -2,9 +2,9 @@ pub mod blob;
 pub mod file;
 pub mod memory;
 
+use crate::api::APIError;
 use actix::prelude::*;
 use tracing_batteries::prelude::*;
-use crate::api::APIError;
 
 use super::api::GlobalState;
 

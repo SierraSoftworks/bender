@@ -1,6 +1,8 @@
 use crate::models::Quote;
 
-use actix_web::{HttpRequest, HttpResponse, Responder, http::header, http::header::Header, body::BoxBody};
+use actix_web::{
+    body::BoxBody, http::header, http::header::Header, HttpRequest, HttpResponse, Responder,
+};
 use tracing_batteries::prelude::*;
 
 #[derive(Serialize, Deserialize)]
@@ -29,22 +31,24 @@ impl From<Quote> for QuoteV1 {
 
 impl Responder for QuoteV1 {
     type Body = BoxBody;
-    
+
     #[tracing::instrument(target="response.render", fields(http.content_type = tracing::field::Empty), skip(self, req))]
     fn respond_to(self, req: &HttpRequest) -> HttpResponse<Self::Body> {
-        let content_type = header::Accept::parse(req).map(|header| {
-            for a in header.iter() {
-                if a.item.essence_str() == "application/json" {
-                    return "application/json"
-                } else if a.item.essence_str() == "text/html" {
-                    return "text/html"
-                } else if a.item.essence_str() == "text/plain" {
-                    return "text/plain"
+        let content_type = header::Accept::parse(req)
+            .map(|header| {
+                for a in header.iter() {
+                    if a.item.essence_str() == "application/json" {
+                        return "application/json";
+                    } else if a.item.essence_str() == "text/html" {
+                        return "text/html";
+                    } else if a.item.essence_str() == "text/plain" {
+                        return "text/plain";
+                    }
                 }
-            }
 
-            "application/json"
-        }).unwrap_or("application/json");
+                "application/json"
+            })
+            .unwrap_or("application/json");
 
         Span::current().record("http.content_type", display(content_type));
 
@@ -54,9 +58,8 @@ impl Responder for QuoteV1 {
             "text/plain" => HttpResponse::Ok()
                 .content_type(content_type)
                 .body(format!("{} – {}", self.quote, self.who)),
-            "text/html" => HttpResponse::Ok()
-                .content_type(content_type)
-                .body(format!("
+            "text/html" => HttpResponse::Ok().content_type(content_type).body(format!(
+                "
                 <html>
                     <head>
                         <style>
@@ -92,11 +95,10 @@ impl Responder for QuoteV1 {
                             <figcaption>{1}</figcaption>
                         </figure>
                     </body>
-                </html>", self.quote, self.who)),
-            _ => HttpResponse::Ok()
-                    .content_type(content_type)
-                    .json(&self),
-            
+                </html>",
+                self.quote, self.who
+            )),
+            _ => HttpResponse::Ok().content_type(content_type).json(&self),
         }
     }
 }
@@ -108,12 +110,14 @@ mod tests {
 
     #[actix_rt::test]
     async fn quote_text() {
-        let quote = QuoteV1{
+        let quote = QuoteV1 {
             quote: "This is a test".to_string(),
-            who: "Tester".to_string()
+            who: "Tester".to_string(),
         };
 
-        let request = TestRequest::default().insert_header((header::ACCEPT, "text/plain; charset=utf-8")).to_http_request();
+        let request = TestRequest::default()
+            .insert_header((header::ACCEPT, "text/plain; charset=utf-8"))
+            .to_http_request();
 
         let resp = quote.respond_to(&request);
         assert_eq!(resp.headers().get("Content-Type").unwrap(), "text/plain");
@@ -121,12 +125,14 @@ mod tests {
 
     #[actix_rt::test]
     async fn quote_html() {
-        let quote = QuoteV1{
+        let quote = QuoteV1 {
             quote: "This is a test".to_string(),
-            who: "Tester".to_string()
+            who: "Tester".to_string(),
         };
 
-        let request = TestRequest::default().insert_header((header::ACCEPT, "text/html; charset=utf-8")).to_http_request();
+        let request = TestRequest::default()
+            .insert_header((header::ACCEPT, "text/html; charset=utf-8"))
+            .to_http_request();
 
         let resp = quote.respond_to(&request);
         assert_eq!(resp.headers().get("Content-Type").unwrap(), "text/html");
@@ -134,20 +140,22 @@ mod tests {
 
     #[actix_rt::test]
     async fn quote_json() {
-        let quote = QuoteV1{
+        let quote = QuoteV1 {
             quote: "This is a test".to_string(),
-            who: "Tester".to_string()
+            who: "Tester".to_string(),
         };
 
-        let request = TestRequest::default().insert_header((header::ACCEPT, "application/json; charset=utf-8")).to_http_request();
+        let request = TestRequest::default()
+            .insert_header((header::ACCEPT, "application/json; charset=utf-8"))
+            .to_http_request();
 
         let resp = quote.respond_to(&request);
-        assert_eq!(resp.headers().get("Content-Type").unwrap(), "application/json");
-
+        assert_eq!(
+            resp.headers().get("Content-Type").unwrap(),
+            "application/json"
+        );
     }
 
     #[actix_rt::test]
-    async fn quote_other() {
-        
-    }
+    async fn quote_other() {}
 }

@@ -1,5 +1,5 @@
-use actix::prelude::*;
 use crate::api::APIError;
+use actix::prelude::*;
 
 #[derive(Clone, Copy)]
 pub struct Health {
@@ -7,8 +7,7 @@ pub struct Health {
     pub started_at: chrono::DateTime<chrono::Utc>,
 }
 
-pub struct GetHealth {
-}
+pub struct GetHealth {}
 
 impl Message for GetHealth {
     type Result = Result<Health, APIError>;
