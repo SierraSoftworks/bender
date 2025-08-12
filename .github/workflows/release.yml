@@ -348,7 +348,7 @@ jobs:
       - name: Fetch handler artifact
         uses: actions/download-artifact@v5
         with:
-          name: build
+          name: ${{ github.repository }}-linux-amd64
       
       - name: 'Login via Azure CLI'
         uses: Azure/login@v2
@@ -391,8 +391,8 @@ jobs:
       - name: Fetch handler artifact
         uses: actions/download-artifact@v5
         with:
-          name: build
-      
+          name: ${{ github.repository }}-linux-amd64
+
       - name: 'Login via Azure CLI'
         uses: azure/login@v2
         with:
