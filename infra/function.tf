@@ -42,7 +42,7 @@ resource "azurerm_linux_function_app" "production" {
   app_settings = merge(
     data.azurerm_linux_function_app.production.app_settings,
     {
-      "OTEL_EXPORTER_OTLP_ENDPOINT" = "https://api.honeycomb.io",
+      "OTEL_EXPORTER_OTLP_ENDPOINT" = "https://refinery.sierrasoftworks.com",
       "OTEL_EXPORTER_OTLP_HEADERS"  = "x-honeycomb-team=${var.honeycomb-key-production}",
       "OTEL_SERVICE_NAME"           = "${var.name}",
       "HONEYCOMB_KEY"               = "${var.honeycomb-key-production}",
