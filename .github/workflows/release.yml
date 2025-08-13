@@ -135,9 +135,12 @@ jobs:
           - arch: amd64
             run_on: ubuntu-latest
             os: linux
-            target: x86_64-unknown-linux-gnu
+            target: x86_64-unknown-linux-musl
             test: true
             builder: cargo
+            setup: |
+              apt update && apt install -y musl-tools
+
           - arch: "arm64"
             os: linux
             run_on: ubuntu-latest
@@ -157,6 +160,10 @@ jobs:
             builder: cargo
 
     steps:
+      - name: Run setup script
+        if: ${{ matrix.setup }}
+        run: ${{ matrix.setup }}
+
       - name: Check out code
         uses: actions/checkout@v5
 
@@ -166,6 +173,7 @@ jobs:
           toolchain: stable
           target: ${{ matrix.target }}
           components: llvm-tools-preview
+
       - name: Install Cross
         if: matrix.builder == 'cross'
         shell: bash
@@ -177,7 +185,6 @@ jobs:
         uses: actions/download-artifact@v5
         with:
           name: cargofile
-
 
       - name: Setup Cache
         uses: Swatinem/rust-cache@v2
