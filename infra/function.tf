@@ -44,6 +44,7 @@ resource "azurerm_linux_function_app" "production" {
     {
       "OTEL_EXPORTER_OTLP_ENDPOINT" = "https://refinery.sierrasoftworks.com",
       "OTEL_EXPORTER_OTLP_HEADERS"  = "x-honeycomb-team=${var.honeycomb-key-production}",
+      "OTEL_EXPORTER_OTLP_PROTOCOL" = "http-binary",
       "OTEL_SERVICE_NAME"           = "${var.name}",
       "HONEYCOMB_KEY"               = "${var.honeycomb-key-production}",
       "HONEYCOMB_DATASET"           = "${honeycombio_dataset.dataset.name}",
