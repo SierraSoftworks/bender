@@ -133,7 +133,7 @@ jobs:
 
           # Linux builds
           - arch: amd64
-            run_on: ubuntu-20.04
+            run_on: ubuntu-latest
             os: linux
             target: x86_64-unknown-linux-gnu
             test: true
