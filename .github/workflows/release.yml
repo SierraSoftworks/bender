@@ -139,7 +139,7 @@ jobs:
             test: true
             builder: cargo
             setup: |
-              apt update && apt install -y musl-tools
+              sudo apt update && sudo apt install -y musl-tools
 
           - arch: "arm64"
             os: linux
