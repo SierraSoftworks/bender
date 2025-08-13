@@ -166,6 +166,8 @@ jobs:
 
       - name: Setup Cache
         uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.run_on }}
 
       - name: Fetch Versioned Cargo.toml
         uses: actions/download-artifact@v5
