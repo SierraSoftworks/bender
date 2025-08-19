@@ -4,7 +4,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.39.0"
+      version = "~> 4.40.0"
     }
 
     azuread = {
@@ -14,7 +14,7 @@ terraform {
 
     honeycombio = {
       source  = "honeycombio/honeycombio"
-      version = "~> 0.37.0"
+      version = "~> 0.38.1"
     }
   }
 }
