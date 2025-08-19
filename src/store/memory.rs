@@ -2,7 +2,7 @@ use crate::api::APIError;
 use crate::telemetry::*;
 use crate::{models::*, trace_handler};
 use actix::prelude::*;
-use rand::seq::{IteratorRandom, SliceRandom};
+use rand::seq::IteratorRandom;
 use std::sync::{Arc, RwLock};
 use tracing_batteries::prelude::*;
 
@@ -124,11 +124,11 @@ impl Handler<GetQuote> for MemoryStore {
 
         let quote = info_span!("quotes.choose").in_scope(|| {
             if msg.who.is_empty() {
-                qs.choose(&mut rand::thread_rng())
+                qs.iter().choose(&mut rand::rng())
             } else {
                 qs.iter()
                     .filter(|q| q.who.to_lowercase() == msg.who.to_lowercase())
-                    .choose(&mut rand::thread_rng())
+                    .choose(&mut rand::rng())
             }
         });
 

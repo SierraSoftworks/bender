@@ -646,7 +646,7 @@ dependencies = [
  "log",
  "mime",
  "openssl-sys",
- "rand 0.8.5",
+ "rand 0.9.2",
  "reqwest",
  "sentry",
  "serde",
