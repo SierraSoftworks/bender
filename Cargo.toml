@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 actix = "0.13"
-actix-rt = "2.10"
+actix-rt = "2.11"
 actix-service = "2.0.3"
 actix-web = "4.11"
 azure_core = "0.27"
