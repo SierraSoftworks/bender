@@ -546,9 +546,9 @@ dependencies = [
 
 [[package]]
 name = "azure_core"
-version = "0.28.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06d2b4c218c9edaddb625c5d287958eb4defb0addf54e6aad9c17bda320269ae"
+checksum = "83109d31929525ba26a3ae075debce56c714214689f65bc8e7e2292eed21d748"
 dependencies = [
  "async-lock",
  "async-trait",
@@ -566,9 +566,9 @@ dependencies = [
 
 [[package]]
 name = "azure_core_macros"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a2df13e12ead1bb9f3b45cebec7e2b36eb6c2e88305745adc34828c1e457f92"
+checksum = "4e91ba42a7f692730a71512a9e631b68a8ac38990092d97864c63c9412508fa4"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -675,7 +675,7 @@ dependencies = [
  "actix-service",
  "actix-web",
  "async-trait",
- "azure_core 0.28.0",
+ "azure_core 0.29.0",
  "azure_storage",
  "azure_storage_blobs",
  "chrono",
@@ -3737,9 +3737,9 @@ checksum = "1dccffe3ce07af9386bfd29e80c0ab1a8205a2fc34e4bcd40364df902cfa8f3f"
 
 [[package]]
 name = "typespec"
-version = "0.8.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd7ebbd28a587eb1c2208dc6f48304eb8b7dea2100d4a83aecb27951a878987a"
+checksum = "92959a692bfe1d08cdfea90bac28677518aa4d0eb615594791003514dd31882d"
 dependencies = [
  "base64 0.22.1",
  "bytes",
@@ -3751,9 +3751,9 @@ dependencies = [
 
 [[package]]
 name = "typespec_client_core"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c722bbf92825952d4f7ab56393e5d200b5c702ef9fb92fd8b4c7a5447107ae6c"
+checksum = "493d3d458d6a6a9ef083729664b9c28418a316cab508156d2eb17efe235eab54"
 dependencies = [
  "async-trait",
  "base64 0.22.1",
@@ -3776,9 +3776,9 @@ dependencies = [
 
 [[package]]
 name = "typespec_macros"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "71ada600035ee156b8898d98dcd58d68f93e685b0d564c4be15a160ccfcb7480"
+checksum = "ce19f07f2d150f184a334e549f762fdb81aff39f1939c5847d7a5b9f0b5ff571"
 dependencies = [
  "proc-macro2",
  "quote",
