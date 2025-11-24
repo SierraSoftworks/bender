@@ -4,7 +4,7 @@ mod actix_web_tracing;
 pub use actix_message::*;
 pub use actix_web_tracing::TracingLogger;
 
-use tracing_batteries::{OpenTelemetry, Sentry, Session, Medama};
+use tracing_batteries::{Medama, OpenTelemetry, Sentry, Session};
 
 pub fn setup() -> Session {
     Session::new("bender", version!())
