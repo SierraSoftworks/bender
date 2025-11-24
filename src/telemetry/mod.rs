@@ -17,5 +17,5 @@ pub fn setup() -> Session {
                 std::env::var("HONEYCOMB_KEY").unwrap_or_default(),
             ),
         )
-        .with_battery(Medama::new("https://medama.sierrasoftworks.com"))
+        .with_battery(Medama::new("https://analytics.sierrasoftworks.com"))
 }
