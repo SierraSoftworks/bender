@@ -75,7 +75,7 @@ where
             propagator.extract(&HeaderMapExtractor::from(req.headers()))
         });
 
-        span.set_parent(context);
+        let _ = span.set_parent(context);
 
         let fut = self
             .service
