@@ -130,6 +130,7 @@ jobs:
             target: x86_64-pc-windows-msvc
             extension: .exe
             builder: cargo
+            cargo-flags: ""
 
           # Linux builds
           - arch: amd64
@@ -140,12 +141,14 @@ jobs:
             builder: cargo
             setup: |
               sudo apt update && sudo apt install -y musl-tools
+            cargo-flags: "--features openssl-vendored"
 
           - arch: "arm64"
             os: linux
             run_on: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             builder: cross
+            cargo-flags: "--features openssl-vendored"
 
           # Apple MacOS builds
           - arch: amd64
@@ -153,11 +156,13 @@ jobs:
             os: darwin
             target: x86_64-apple-darwin
             builder: cargo
+            cargo-flags: "--features openssl-vendored"
           - arch: arm64
             run_on: macos-latest
             os: darwin
             target: aarch64-apple-darwin
             builder: cargo
+            cargo-flags: "--features openssl-vendored"
 
     steps:
       - name: Run setup script
@@ -190,7 +195,8 @@ jobs:
         run: |
           curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
           cargo binstall --no-confirm cross --force
-          cross  build --release --target ${{ matrix.target }}
+          echo "/home/runner/.cargo/bin" >> $GITHUB_PATH
+          cross  build --release --target ${{ matrix.target }} ${{ matrix.cargo-flags }}
           
       - name: cargo build
         if: matrix.builder != 'cross'
