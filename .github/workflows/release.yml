@@ -200,7 +200,7 @@ jobs:
           
       - name: cargo build
         if: matrix.builder != 'cross'
-        run: cargo build --release --target ${{ matrix.target }}
+        run: cargo build --release --target ${{ matrix.target }} ${{ matrix.cargo-flags }}
 
       - name: Upload GitHub Release Artifacts
         uses: SierraSoftworks/gh-releases@v1.0.8
