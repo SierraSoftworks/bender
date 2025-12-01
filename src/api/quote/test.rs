@@ -1,9 +1,9 @@
-use super::{configure, models, GlobalState};
+use super::{GlobalState, configure, models};
 use crate::models::*;
 
 use actix_web::web::Data;
 #[cfg(test)]
-use actix_web::{test, App};
+use actix_web::{App, test};
 
 #[actix_rt::test]
 async fn quote_v1_not_found_status() {

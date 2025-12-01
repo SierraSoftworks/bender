@@ -1,4 +1,4 @@
-use actix_web::{error, http::StatusCode, HttpResponse};
+use actix_web::{HttpResponse, error, http::StatusCode};
 use std::fmt;
 use tracing_batteries::prelude::*;
 

@@ -3,7 +3,7 @@ mod models;
 mod test;
 
 use crate::telemetry::*;
-use actix_web::{get, web, HttpRequest};
+use actix_web::{HttpRequest, get, web};
 use tracing_batteries::prelude::*;
 
 use super::APIError;
@@ -60,7 +60,9 @@ pub async fn tracing_v1(req: HttpRequest) -> Result<String, APIError> {
         "disabled"
     };
 
-    let reply = format!("OpenTelemetry TraceParent is: {traceparent} (current trace ID is: {traceid}, sampling is {sampling})\n\n{headers}");
+    let reply = format!(
+        "OpenTelemetry TraceParent is: {traceparent} (current trace ID is: {traceid}, sampling is {sampling})\n\n{headers}"
+    );
 
     Ok(reply)
 }

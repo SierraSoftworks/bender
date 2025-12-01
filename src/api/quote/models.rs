@@ -1,7 +1,7 @@
 use crate::models::Quote;
 
 use actix_web::{
-    body::BoxBody, http::header, http::header::Header, HttpRequest, HttpResponse, Responder,
+    HttpRequest, HttpResponse, Responder, body::BoxBody, http::header, http::header::Header,
 };
 use tracing_batteries::prelude::*;
 

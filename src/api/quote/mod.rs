@@ -3,7 +3,7 @@ mod models;
 mod test;
 
 use crate::telemetry::*;
-use actix_web::{get, web, HttpRequest, Result};
+use actix_web::{HttpRequest, Result, get, web};
 use tracing_batteries::prelude::*;
 
 use super::{APIError, GlobalState};

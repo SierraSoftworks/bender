@@ -3,7 +3,7 @@ use crate::models::*;
 
 use actix_web::web::Data;
 #[cfg(test)]
-use actix_web::{test, App};
+use actix_web::{App, test};
 
 #[actix_rt::test]
 async fn health_v1_status() {

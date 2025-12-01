@@ -8,7 +8,7 @@ extern crate serde_json;
 extern crate tokio;
 extern crate uuid;
 
-use actix_web::{web::Data, App, HttpServer};
+use actix_web::{App, HttpServer, web::Data};
 use tracing_batteries::prelude::*;
 
 mod api;

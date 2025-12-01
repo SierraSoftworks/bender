@@ -3,7 +3,7 @@ use crate::telemetry::*;
 use crate::{api::APIError, models::*};
 use actix::prelude::*;
 #[allow(unused_imports)]
-use azure_identity::{ManagedIdentityCredential, DeveloperToolsCredential};
+use azure_identity::{DeveloperToolsCredential, ManagedIdentityCredential};
 use azure_storage_blob::{BlobClient, BlobClientOptions};
 use std::path::PathBuf;
 use tracing_batteries::prelude::*;
