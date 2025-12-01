@@ -34,7 +34,7 @@ impl Loader for BlobLoader {
         let blob_client = BlobClient::new(
             &format!("https://{}.blob.core.windows.net", self.account_name),
             self.container.as_str(),
-            &self.path.to_string_lossy().to_string(),
+            self.path.to_string_lossy().as_ref(),
             Some(credential),
             Some(BlobClientOptions::default())
         ).map_err(|err| {
