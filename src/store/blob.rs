@@ -2,14 +2,15 @@ use super::{Loader, Store};
 use crate::telemetry::*;
 use crate::{api::APIError, models::*};
 use actix::prelude::*;
-use azure_storage::{ConnectionString, StorageCredentials};
-use azure_storage_blobs::prelude::*;
+#[allow(unused_imports)]
+use azure_identity::{ManagedIdentityCredential, DeveloperToolsCredential};
+use azure_storage_blob::{BlobClient, BlobClientOptions};
 use std::path::PathBuf;
 use tracing_batteries::prelude::*;
 
 #[allow(dead_code)]
 pub struct BlobLoader {
-    pub connection_string: String,
+    pub account_name: String,
     pub container: String,
     pub path: PathBuf,
 }
@@ -19,30 +20,30 @@ impl Loader for BlobLoader {
     #[tracing::instrument(err, skip(self, state), fields(otel.kind = "internal"))]
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), APIError> {
         debug!("Initializing Azure Blob storage client");
-
-        let connection_string = ConnectionString::new(self.connection_string.as_str())
-            .map_err(|err| {
-                error!({ exception.message = %err }, "Unable to parse Azure Blob Storage connection string");
-                APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
-            })?;
-
-        let account = connection_string.account_name.ok_or_else(|| {
-            error!("Unable to parse Azure Blob Storage connection string, it is missing the account name field");
-            APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
+        #[cfg(debug_assertions)]
+        let credential = ManagedIdentityCredential::new(None).map_err(|err| {
+            error!({ exception.message = %err }, "Failed to create Managed Identity Credential for Azure Blob Storage.");
+            APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to load quotes right now. Please try again later...")
+        })?;
+        #[cfg(not(debug_assertions))]
+        let credential = DeveloperToolsCredential::new(None).map_err(|err| {
+            error!({ exception.message = %err }, "Failed to create Developer Tools Credential for Azure Blob Storage.");
+            APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to load quotes right now. Please try again later...")
         })?;
 
-        let access_key = connection_string.account_key.ok_or_else(|| {
-            error!("Unable to parse Azure Blob Storage connection string, it is missing the account key field");
-            APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
+        let blob_client = BlobClient::new(
+            &format!("https://{}.blob.core.windows.net", self.account_name),
+            self.container.as_str(),
+            &self.path.to_string_lossy().to_string(),
+            Some(credential),
+            Some(BlobClientOptions::default())
+        ).map_err(|err| {
+            error!({ exception.message = %err }, "Failed to create Azure Blob Client.");
+            APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to load quotes right now. Please try again later...")
         })?;
-
-        let creds = StorageCredentials::access_key(account.to_string(), access_key.to_string());
-        let blob_client = ClientBuilder::new(account, creds)
-            .blob_client(&self.container, self.path.to_string_lossy().to_string());
 
         debug!("Fetching {}", self.path.display());
-        let blob = blob_client
-                    .get_content()
+        let blob = blob_client.download(None)
                     .instrument(info_span!("get_blob", "otel.kind" = "client", db.system = "azure_storage", db.instance = self.container.as_str(), db.statement = format!("GET {}", self.path.display()).as_str()))
                     .await
                     .map_err(|err| {
@@ -50,7 +51,12 @@ impl Loader for BlobLoader {
                         APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
                     })?;
 
-        let fc: Vec<BlobQuoteV1> = debug_span!("deserialize").in_scope(|| serde_json::from_slice(&blob) )
+        let body = blob.into_body().collect().await.map_err(|err| {
+            error!({ exception.message = %err }, "Failed to read quote file from Azure Blob Storage.");
+            APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
+        })?;
+
+        let fc: Vec<BlobQuoteV1> = debug_span!("deserialize").in_scope(|| serde_json::from_slice(&body))
             .map_err(|err| {
                 error!({ exception.message = %err }, "Unable to parse quote file.");
                 APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
@@ -116,7 +122,7 @@ mod tests {
     #[ignore] // Test disabled until we have support for the storage emulator
     async fn load_quotes() {
         let loader = BlobLoader {
-            connection_string: "UseDevelopmentStorage=true".to_string(),
+            account_name: "devstoreaccount1".to_string(),
             container: "quotes".to_string(),
             path: PathBuf::from("quotes.json"),
         };

@@ -1,5 +1,6 @@
 use actix_web::{error, http::StatusCode, HttpResponse};
 use std::fmt;
+use tracing_batteries::prelude::*;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct APIError {
@@ -37,12 +38,8 @@ impl fmt::Display for APIError {
 }
 
 impl From<actix::MailboxError> for APIError {
-    fn from(_: actix::MailboxError) -> Self {
-        sentry::capture_event(sentry::protocol::Event {
-            message: Some("Failed to send message to Actix Actor".into()),
-            level: sentry::protocol::Level::Error,
-            ..Default::default()
-        });
+    fn from(err: actix::MailboxError) -> Self {
+        error!({ exception.message = %err }, "Failed to send message to Actix Actor");
 
         Self::new(
             500,
