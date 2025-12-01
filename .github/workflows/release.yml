@@ -369,7 +369,10 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: ${{ github.event.repository.name }}-linux-amd64
-      
+
+      - name: Ensure binary is executable
+        run: chmod +x ${{ github.event.repository.name }}
+        
       - name: 'Login via Azure CLI'
         uses: Azure/login@v2
         with:
@@ -412,6 +415,9 @@ jobs:
         uses: actions/download-artifact@v6
         with:
           name: ${{ github.event.repository.name }}-linux-amd64
+
+      - name: Ensure binary is executable
+        run: chmod +x ${{ github.event.repository.name }}
 
       - name: 'Login via Azure CLI'
         uses: azure/login@v2
