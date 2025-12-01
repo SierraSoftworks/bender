@@ -184,16 +184,17 @@ jobs:
         with:
           key: ${{ matrix.run_on }}
 
-      - name: Install Cross
+      - name: build with cross
         if: matrix.builder == 'cross'
         shell: bash
         run: |
           curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
           cargo binstall --no-confirm cross
-          echo "$CARGO_HOME/bin" >> $GITHUB_PATH
-
+          cross  build --release --target ${{ matrix.target }}
+          
       - name: cargo build
-        run: ${{ matrix.builder }} build --release --target ${{ matrix.target }}
+        if: matrix.builder != 'cross'
+        run: cargo build --release --target ${{ matrix.target }}
 
       - name: Upload GitHub Release Artifacts
         uses: SierraSoftworks/gh-releases@v1.0.8
