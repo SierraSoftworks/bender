@@ -24,7 +24,7 @@ rand = "0.9"
 reqwest = { version = "0.13" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-tokio = { version = "1.48", features = ["sync"] }
+tokio = { version = "1.49", features = ["sync"] }
 tonic = { version = "0.12", features = ["tls-roots"] }
 tracing-batteries = { git = "https://github.com/sierrasoftworks/tracing-batteries-rs.git", features = ["medama"] }
 uuid = { version = "0.7", features = ["serde", "v4", "u128" ]}
