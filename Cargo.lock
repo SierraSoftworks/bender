@@ -559,9 +559,9 @@ dependencies = [
 
 [[package]]
 name = "azure_storage_blob"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "89cd8900ebab0da5cde56e07b8d9e4b94bfa5ede5ee6f5429027b93b58e1104e"
+checksum = "72693fc24f79adee4b3df7469b29724aa7ea25b908ea0e23f62b93f01f098283"
 dependencies = [
  "async-trait",
  "azure_core",
