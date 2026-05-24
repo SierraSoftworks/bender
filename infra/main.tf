@@ -53,3 +53,13 @@ variable "allowed_origins" {
   type        = set(string)
   default     = ["*"]
 }
+
+variable "cloudflare_account_id" {
+  description = "The Cloudflare account ID used to locate the DNS zone."
+  type        = string
+
+  validation {
+    condition     = can(regex("^[0-9a-fA-F]{32}$", var.cloudflare_account_id))
+    error_message = "The cloudflare_account_id value must be a 32-character hexadecimal account ID."
+  }
+}
