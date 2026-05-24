@@ -16,6 +16,11 @@ terraform {
       source  = "honeycombio/honeycombio"
       version = "~> 0.49.0"
     }
+
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 4.0"
+    }
   }
 }
 
@@ -45,6 +50,8 @@ provider "azuread" {
 provider "honeycombio" {
   # You can set the API key with the environment variable HONEYCOMB_API_KEY
 }
+
+provider "cloudflare" {}
 
 
 variable "azure_subscription" {

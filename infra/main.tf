@@ -53,3 +53,7 @@ variable "allowed_origins" {
   type        = set(string)
   default     = ["*"]
 }
+
+variable "cloudflare_account_id" {
+  description = "The Cloudflare account ID used to locate the DNS zone."
+}
