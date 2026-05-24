@@ -1,12 +1,12 @@
 data "cloudflare_zones" "production" {
-  filter {
-    account_id = var.cloudflare_account_id
-    name       = var.domain
+  account = {
+    id = var.cloudflare_account_id
   }
+  name = var.domain
 }
 
 locals {
-  cloudflare_zone_id = one(data.cloudflare_zones.production.zones[*].id)
+  cloudflare_zone_id = one(data.cloudflare_zones.production.result[*].id)
 }
 
 resource "azurerm_dns_cname_record" "production" {
@@ -28,19 +28,19 @@ resource "azurerm_dns_txt_record" "production-validation" {
   }
 }
 
-resource "cloudflare_record" "production" {
+resource "cloudflare_dns_record" "production" {
   name    = var.name
   zone_id = local.cloudflare_zone_id
   type    = "CNAME"
-  value   = azurerm_linux_function_app.production.default_hostname
+  content = azurerm_linux_function_app.production.default_hostname
   ttl     = 300
 }
 
-resource "cloudflare_record" "production-validation" {
+resource "cloudflare_dns_record" "production-validation" {
   name    = "asuid.${var.name}"
   zone_id = local.cloudflare_zone_id
   type    = "TXT"
-  value   = azurerm_linux_function_app.production.custom_domain_verification_id
+  content = azurerm_linux_function_app.production.custom_domain_verification_id
   ttl     = 300
 }
 
@@ -63,18 +63,18 @@ resource "azurerm_dns_txt_record" "staging-validation" {
   }
 }
 
-resource "cloudflare_record" "staging" {
+resource "cloudflare_dns_record" "staging" {
   name    = "${var.name}-staging"
   zone_id = local.cloudflare_zone_id
   type    = "CNAME"
-  value   = azurerm_linux_function_app.staging.default_hostname
+  content = azurerm_linux_function_app.staging.default_hostname
   ttl     = 300
 }
 
-resource "cloudflare_record" "staging-validation" {
+resource "cloudflare_dns_record" "staging-validation" {
   name    = "asuid.${var.name}-staging"
   zone_id = local.cloudflare_zone_id
   type    = "TXT"
-  value   = azurerm_linux_function_app.staging.custom_domain_verification_id
+  content = azurerm_linux_function_app.staging.custom_domain_verification_id
   ttl     = 300
 }
