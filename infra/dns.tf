@@ -5,6 +5,10 @@ data "cloudflare_zones" "production" {
   }
 }
 
+locals {
+  cloudflare_zone_id = one(data.cloudflare_zones.production.zones[*].id)
+}
+
 resource "azurerm_dns_cname_record" "production" {
   name                = var.name
   resource_group_name = "dns"
@@ -26,7 +30,7 @@ resource "azurerm_dns_txt_record" "production-validation" {
 
 resource "cloudflare_record" "production" {
   name    = var.name
-  zone_id = data.cloudflare_zones.production.zones[0].id
+  zone_id = local.cloudflare_zone_id
   type    = "CNAME"
   value   = azurerm_linux_function_app.production.default_hostname
   ttl     = 300
@@ -34,7 +38,7 @@ resource "cloudflare_record" "production" {
 
 resource "cloudflare_record" "production-validation" {
   name    = "asuid.${var.name}"
-  zone_id = data.cloudflare_zones.production.zones[0].id
+  zone_id = local.cloudflare_zone_id
   type    = "TXT"
   value   = azurerm_linux_function_app.production.custom_domain_verification_id
   ttl     = 300
@@ -61,7 +65,7 @@ resource "azurerm_dns_txt_record" "staging-validation" {
 
 resource "cloudflare_record" "staging" {
   name    = "${var.name}-staging"
-  zone_id = data.cloudflare_zones.production.zones[0].id
+  zone_id = local.cloudflare_zone_id
   type    = "CNAME"
   value   = azurerm_linux_function_app.staging.default_hostname
   ttl     = 300
@@ -69,7 +73,7 @@ resource "cloudflare_record" "staging" {
 
 resource "cloudflare_record" "staging-validation" {
   name    = "asuid.${var.name}-staging"
-  zone_id = data.cloudflare_zones.production.zones[0].id
+  zone_id = local.cloudflare_zone_id
   type    = "TXT"
   value   = azurerm_linux_function_app.staging.custom_domain_verification_id
   ttl     = 300
