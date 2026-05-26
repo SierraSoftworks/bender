@@ -4,7 +4,7 @@ mod actix_web_tracing;
 pub use actix_message::*;
 pub use actix_web_tracing::TracingLogger;
 
-use tracing_batteries::{Medama, OpenTelemetry, Sentry, Session};
+use tracing_batteries::{Umami, OpenTelemetry, Sentry, Session};
 
 pub fn setup() -> Session {
     Session::new("bender", version!())
@@ -17,5 +17,5 @@ pub fn setup() -> Session {
                 std::env::var("HONEYCOMB_KEY").unwrap_or_default(),
             ),
         )
-        .with_battery(Medama::new("https://analytics.sierrasoftworks.com"))
+        .with_battery(Umami::new("https://analytics.sierrasoftworks.com", "e135ccf5-76f9-4fdd-a1bc-92f7652648f9"))
 }
