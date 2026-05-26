@@ -22,12 +22,12 @@ http = "1.4"
 log = "0.4"
 mime = "0.3"
 rand = "0.10"
-reqwest = { version = "0.13" }
+reqwest = { version = "0.13.1" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tokio = { version = "1.52", features = ["sync"] }
 tonic = { version = "0.12", features = ["tls-roots"] }
-tracing-batteries = { git = "https://github.com/sierrasoftworks/tracing-batteries-rs.git", features = ["medama"] }
+tracing-batteries = { git = "https://github.com/sierrasoftworks/tracing-batteries-rs.git", features = ["umami"] }
 uuid = { version = "0.7", features = ["serde", "v4", "u128" ]}
 openssl-sys = { version = "0.9.116", features = ["vendored"], optional = true }
 tracing = "0.1.44"
