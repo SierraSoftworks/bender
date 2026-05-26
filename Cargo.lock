@@ -592,6 +592,7 @@ dependencies = [
  "actix-service",
  "actix-web",
  "async-trait",
+ "azure_core",
  "azure_identity",
  "azure_storage_blob",
  "chrono",

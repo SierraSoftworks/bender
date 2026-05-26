@@ -2,10 +2,11 @@ use super::{Loader, Store};
 use crate::telemetry::*;
 use crate::{api::APIError, models::*};
 use actix::prelude::*;
+use azure_core::{credentials::TokenCredential, http::Url};
 #[allow(unused_imports)]
 use azure_identity::{DeveloperToolsCredential, ManagedIdentityCredential};
-use azure_storage_blob::{BlobClient, BlobClientOptions};
-use std::path::PathBuf;
+use azure_storage_blob::BlobClient;
+use std::{path::PathBuf, sync::Arc};
 use tracing_batteries::prelude::*;
 
 #[allow(dead_code)]
@@ -21,22 +22,30 @@ impl Loader for BlobLoader {
     async fn load_quotes(&self, state: Addr<Store>) -> Result<(), APIError> {
         debug!("Initializing Azure Blob storage client");
         #[cfg(debug_assertions)]
-        let credential = ManagedIdentityCredential::new(None).map_err(|err| {
-            error!({ exception.message = %err }, "Failed to create Managed Identity Credential for Azure Blob Storage.");
+        let credential: Arc<dyn TokenCredential> = DeveloperToolsCredential::new(None).map_err(|err| {
+            error!({ exception.message = %err }, "Failed to create Developer Tools Credential for Azure Blob Storage.");
             APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to load quotes right now. Please try again later...")
         })?;
         #[cfg(not(debug_assertions))]
-        let credential = DeveloperToolsCredential::new(None).map_err(|err| {
-            error!({ exception.message = %err }, "Failed to create Developer Tools Credential for Azure Blob Storage.");
+        let credential: Arc<dyn TokenCredential> = ManagedIdentityCredential::new(None).map_err(|err| {
+            error!({ exception.message = %err }, "Failed to create Managed Identity Credential for Azure Blob Storage.");
+            APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to load quotes right now. Please try again later...")
+        })?;
+
+        let blob_url = Url::parse(&format!(
+            "https://{}.blob.core.windows.net/{}/{}",
+            self.account_name,
+            self.container,
+            self.path.to_string_lossy()
+        )).map_err(|err| {
+            error!({ exception.message = %err }, "Failed to create Azure Blob URL.");
             APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to load quotes right now. Please try again later...")
         })?;
 
         let blob_client = BlobClient::new(
-            &format!("https://{}.blob.core.windows.net", self.account_name),
-            self.container.as_str(),
-            self.path.to_string_lossy().as_ref(),
+            blob_url,
             Some(credential),
-            Some(BlobClientOptions::default())
+            None,
         ).map_err(|err| {
             error!({ exception.message = %err }, "Failed to create Azure Blob Client.");
             APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to load quotes right now. Please try again later...")
@@ -51,7 +60,7 @@ impl Loader for BlobLoader {
                         APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
                     })?;
 
-        let body = blob.into_body().collect().await.map_err(|err| {
+        let body = blob.body.collect().await.map_err(|err| {
             error!({ exception.message = %err }, "Failed to read quote file from Azure Blob Storage.");
             APIError::new(503, "Service Unavailable", "We're sorry, but we can't seem to find any quotes around here right now. Please check back soon.")
         })?;
