@@ -187,7 +187,7 @@ jobs:
       - name: Setup Cache
         uses: Swatinem/rust-cache@v2
         with:
-          key: ${{ matrix.run_on }}
+          key: ${{ matrix.target }}
 
       - name: build with cross
         if: matrix.builder == 'cross'
