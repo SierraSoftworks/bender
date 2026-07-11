@@ -1,34 +1,17 @@
-FROM clux/muslrust:stable as builder
-
-RUN apt-get update && apt-get install -y openssl libssl-dev unzip protobuf-compiler gcc
-
-WORKDIR /src
-
-# Pre-build all dependencies
-RUN USER=root cargo init --bin --name bender
-COPY ./Cargo.lock .
-COPY ./Cargo.toml .
-RUN cargo build --release --locked && rm -rf target/*/release/deps/bender*
-RUN rm src/*.rs
-
-# Add the source code
-COPY . .
-
-# Run the test suite
-RUN cargo test --release && rm -rf target/*/release/deps/bender*
-
-# Build the final executable of the project
-RUN cargo build --release --bin bender --locked
-
-# Ensure that the binary is at a known location for the next stage
-RUN mkdir /out && \
-    rm /src/target/*/release/deps/bender*.d && \
-    cp /src/target/*/release/deps/bender* /out/bender
-
+# NOTE: This Dockerfile depends on you building the bender binary first.
+# It will then package that binary into the image, and use that as the entrypoint.
+# This means that running `docker build` is not a repeatable way to build the same
+# image, but the benefit is much faster cross-platform builds; a net win.
+#
+# The binary is expected to be a statically linked (musl) executable placed at
+# ./bender in the build context (see .github/workflows/release.yml).
 FROM cgr.dev/chainguard/static:latest
 
-COPY --from=builder /out/bender /app/bender
-ADD ./quotes.json /app/quotes.json
+LABEL org.opencontainers.image.source=https://github.com/SierraSoftworks/bender
+LABEL org.opencontainers.image.description="Your unfriendly source of Futurama quotes"
+
+COPY ./bender /app/bender
+COPY ./quotes.json /app/quotes.json
 
 WORKDIR /app
 ENTRYPOINT [ "/app/bender" ]
