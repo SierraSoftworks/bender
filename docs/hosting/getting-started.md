@@ -6,7 +6,7 @@ description: Let's get you started with running your own Bender server.
 
 ## Starting the Server
 
-We package up Bender as a Docker image which can be run on any Linux x86\_64 host. By default, the container will listen on port 8000.
+We package up Bender as a multi-arch Docker image which can be run on any Linux `x86_64` (`amd64`) or `arm64` host. By default, the container will listen on port 8000.
 
 ```
 $ docker pull ghcr.io/sierrasoftworks/bender/bender

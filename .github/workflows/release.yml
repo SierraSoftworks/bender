@@ -6,6 +6,8 @@ on:
       - "docs/**"
   pull_request:
     branches: [ main ]
+  release:
+    types: [published]
 
 permissions:
   id-token: write
@@ -15,7 +17,8 @@ env:
   CARGO_TERM_COLOR: always
   VERSION: "0.0.0-dev"
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  # Published as ghcr.io/sierrasoftworks/bender/bender (see docs/hosting).
+  IMAGE_NAME: ${{ github.repository }}/bender
 
   STAGING_DEPLOYMENT_APP_ID: 65d7542d-354d-4129-898c-8848be8d5ecd
   STAGING_FUNCTION_NAME: bender-sierrasoftworks-staging
@@ -82,15 +85,6 @@ jobs:
           toolchain: stable
           components: llvm-tools-preview
 
-      - name: install protoc
-        run: |
-          $protoc_url = "https://github.com/protocolbuffers/protobuf/releases/download/v3.20.2/protoc-3.20.2-linux-x86_64.zip"
-          Write-Host "Downloading protoc from '$protoc_url'"
-          Invoke-WebRequest -OutFile protoc.zip -Uri $protoc_url
-          Expand-Archive protoc.zip -DestinationPath ../tools
-          Add-Content -Path $env:GITHUB_PATH -Value "$((Get-Item ./).Parent.FullName)/tools/bin"
-        shell: pwsh
-
       - name: Setup Cache
         uses: Swatinem/rust-cache@v2
 
@@ -146,7 +140,7 @@ jobs:
           - arch: "arm64"
             os: linux
             run_on: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
+            target: aarch64-unknown-linux-musl
             builder: cross
             cargo-flags: "--features openssl-vendored"
 
@@ -179,15 +173,22 @@ jobs:
           target: ${{ matrix.target }}
           components: llvm-tools-preview
 
+      # Set up the cache before fetching the versioned Cargo.toml.
+      # Swatinem/rust-cache derives its cache key from the contents of
+      # Cargo.toml/Cargo.lock, so restoring the version-bumped Cargo.toml first
+      # would change the key on release builds and prevent any cache from being
+      # restored, forcing a full rebuild every time.
+      - name: Setup Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          # Give each matrix entry its own cache scope so the jobs don't clobber
+          # one another's caches (cross-built targets in particular).
+          key: ${{ matrix.target }}
+
       - name: Fetch Versioned Cargo.toml
         uses: actions/download-artifact@v8
         with:
           name: cargofile
-
-      - name: Setup Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          key: ${{ matrix.target }}
 
       - name: build with cross
         if: matrix.builder == 'cross'
@@ -222,7 +223,9 @@ jobs:
     needs:
       - build
 
-    if: github.event_name == 'release'
+    # Publish a fresh multi-arch image for every commit that lands on main, as
+    # well as for tagged releases. Pull requests build binaries but do not push.
+    if: github.event_name == 'push' || github.event_name == 'release'
 
     permissions:
       contents: read
@@ -261,9 +264,11 @@ jobs:
           images: ${{ env.FULL_IMAGE_NAME }}
           tags: |
             type=ref,event=branch
+            type=sha,format=long
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Checkout code
         uses: actions/checkout@v7
@@ -306,7 +311,7 @@ jobs:
     needs:
       - docker-build
 
-    if: github.event_name == 'release'
+    if: github.event_name == 'push' || github.event_name == 'release'
 
     permissions:
       contents: read
