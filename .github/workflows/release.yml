@@ -196,7 +196,7 @@ jobs:
       # symbols out, so release assets keep their usual size.
       - name: Publish debug symbols
         uses: SierraSoftworks/symbols@v1
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || github.ref == 'ref/heads/main'
         with:
           binary: target/${{ matrix.target }}/release/${{ github.event.repository.name }}${{ matrix.extension }}
           version: ${{ github.event.release.tag_name }}
