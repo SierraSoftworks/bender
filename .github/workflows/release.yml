@@ -194,7 +194,7 @@ jobs:
           CARGO_PROFILE_RELEASE_DEBUG: ${{ github.event_name == 'release' && '1' || 'false' }}
           # Static musl links don't emit a GNU build-id note by default; the
           # symbols pipeline keys everything off it.
-          RUSTFLAGS: ${{ matrix.os == 'linux' && '-C link-arg=-Wl,--build-id=sha1' || '' }}
+          RUSTFLAGS: ${{ matrix.os == 'linux' && '-C link-arg=--build-id=sha1' || '' }}
         run: cargo build --release --target ${{ matrix.target }} ${{ matrix.cargo-flags }}
 
       # Publish debug symbols to symbols.sierrasoftworks.com (build ID derived
