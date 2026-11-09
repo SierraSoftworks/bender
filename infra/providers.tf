@@ -14,7 +14,7 @@ terraform {
 
     honeycombio = {
       source  = "honeycombio/honeycombio"
-      version = "~> 0.55.0"
+      version = "~> 0.56.0"
     }
 
     cloudflare = {
